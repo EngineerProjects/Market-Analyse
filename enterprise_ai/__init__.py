@@ -1,6 +1,5 @@
 """
 Enterprise AI - A platform for autonomous AI teams.
-
 This package provides a framework for creating, customizing, and deploying
 autonomous AI teams that work together like real companies to execute complex tasks.
 """

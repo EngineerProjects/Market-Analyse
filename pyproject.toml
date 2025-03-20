@@ -18,7 +18,10 @@ classifiers = [
 ]
 
 dependencies = [
+    "pydantic>=2.10.6",
     "pytest-cov>=6.0.0",
+    "tomli>=2.2.1",
+    "types-pyyaml>=6.0.12.20241230",
 ]
 
 [project.optional-dependencies]
@@ -38,9 +41,9 @@ warn_return_any = true
 warn_unused_configs = true
 disallow_untyped_defs = true
 disallow_incomplete_defs = true
-mypy_path = "enterprise_ai"
-explicit_package_bases = true 
-ignore_missing_imports = true # this is a temporary workaround for the fact that mypy does not support PEP 563
+explicit_package_bases = true
+namespace_packages = true
+ignore_missing_imports = true
 
 [[tool.mypy.overrides]]
 module = "tests.*"

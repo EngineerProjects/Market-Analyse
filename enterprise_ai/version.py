@@ -1,10 +1,9 @@
 """
 Version information for the Enterprise AI package.
-
 This module follows semantic versioning (SemVer) and PEP 440 guidelines.
 """
 
-from collections import namedtuple  # <-- Move the import to the top
+from collections import namedtuple
 
 __all__ = ["__version__", "version_info", "VERSION"]
 
@@ -16,7 +15,6 @@ __version__ = ".".join(map(str, VERSION))
 
 # Version information as named tuple
 VersionInfo = namedtuple("VersionInfo", ["major", "minor", "micro"])
-
 version_info = VersionInfo(major=VERSION[0], minor=VERSION[1], micro=VERSION[2])
 
 # Compatibility with standard __version_info__ pattern
@@ -28,6 +26,7 @@ def get_version(pretty: bool = False) -> str:
 
     Args:
         pretty (bool): If True, returns a formatted version string
+
     Returns:
         str: Version string
     """
