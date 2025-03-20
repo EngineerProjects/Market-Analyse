@@ -136,3 +136,6 @@ poetry.toml
 pyrightconfig.json
 
 logs/
+
+# Ignore uv.lock
+uv.lock
