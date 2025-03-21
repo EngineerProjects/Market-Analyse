@@ -26,6 +26,7 @@ from enterprise_ai.logger import (
     trace_execution,
     warning,
     with_context,
+    shutdown,
 )
 
 
@@ -38,18 +39,33 @@ def reset_logger_singleton():
     original_context_var = (
         EnterpriseLogger._context_var.copy() if EnterpriseLogger._context_var else {}
     )
+    original_handler_ids = (
+        EnterpriseLogger._handler_ids.copy() if hasattr(EnterpriseLogger, "_handler_ids") else []
+    )
+
+    # Clean up existing handlers
+    if EnterpriseLogger._instance is not None:
+        EnterpriseLogger._instance._cleanup_handlers()
 
     # Reset state
     EnterpriseLogger._instance = None
     EnterpriseLogger._initialized = False
     EnterpriseLogger._context_var = {}
+    if hasattr(EnterpriseLogger, "_handler_ids"):
+        EnterpriseLogger._handler_ids = []
 
     yield
+
+    # Clean up any handlers created during the test
+    if EnterpriseLogger._instance is not None:
+        EnterpriseLogger._instance._cleanup_handlers()
 
     # Restore original state
     EnterpriseLogger._instance = original_instance
     EnterpriseLogger._initialized = original_initialized
     EnterpriseLogger._context_var = original_context_var
+    if hasattr(EnterpriseLogger, "_handler_ids"):
+        EnterpriseLogger._handler_ids = original_handler_ids
 
 
 class TestLoggerConfig:
@@ -176,6 +192,83 @@ class TestEnterpriseLogger:
         assert "team_id" in team_logger.context
         assert team_logger.context["name"] == "team"
         assert team_logger.context["team_id"] == "team-1"
+
+    def test_handler_tracking(self):
+        """Test that handlers are properly tracked."""
+        logger = EnterpriseLogger(LoggerConfig(log_dir=self.temp_dir))
+
+        # Verify that handler IDs are tracked
+        assert len(logger._handler_ids) == 2  # Console and file handlers
+
+        # Create new configuration and reconfigure
+        new_config = LoggerConfig(
+            console_level=LoggerConfig.WARNING,
+            file_level=LoggerConfig.ERROR,
+            log_dir=self.temp_dir,
+        )
+
+        logger.configure(new_config)
+
+        # Verify that handlers were replaced but count remains the same
+        assert len(logger._handler_ids) == 2
+
+    def test_logger_shutdown(self):
+        """Test that logger shutdown cleans up resources."""
+        logger = EnterpriseLogger(LoggerConfig(log_dir=self.temp_dir))
+
+        # Verify initial handler count
+        assert len(logger._handler_ids) == 2
+
+        # Shutdown logger
+        logger.shutdown()
+
+        # Verify that handlers were removed
+        assert len(logger._handler_ids) == 0
+
+        # Reconfigure to add handlers again for next test
+        logger._configure_logger()
+        assert len(logger._handler_ids) == 2
+
+    def test_context_manager(self):
+        """Test that logger works as a context manager."""
+        # Use logger as context manager
+        with EnterpriseLogger(LoggerConfig(log_dir=self.temp_dir)) as logger:
+            # Verify that logger is configured
+            assert len(logger._handler_ids) == 2
+
+            # Get component logger and log a message
+            component_logger = logger.get_logger("test_component")
+            component_logger.info("Test message")
+
+        # Verify that handlers were cleaned up after exiting context
+        assert len(logger._handler_ids) == 0
+
+    def test_global_shutdown(self):
+        """Test the global shutdown function."""
+        logger = EnterpriseLogger(LoggerConfig(log_dir=self.temp_dir))
+
+        # Verify initial handler count
+        assert len(logger._handler_ids) == 2
+
+        # Call global shutdown function
+        shutdown()
+
+        # Verify that handlers were removed
+        assert len(logger._handler_ids) == 0
+
+    def test_cleanup_handlers_handles_nonexistent_handlers(self):
+        """Test that cleanup_handlers safely handles nonexistent handlers."""
+        # Create logger
+        logger = EnterpriseLogger(LoggerConfig(log_dir=self.temp_dir))
+
+        # Add a non-existent handler ID to simulate an already removed handler
+        logger._handler_ids.append(99999)
+
+        # Should not raise any exceptions when cleaning up
+        logger._cleanup_handlers()
+
+        # Handlers list should be empty
+        assert len(logger._handler_ids) == 0
 
 
 class TestLoggingFunctions:

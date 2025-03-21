@@ -8,15 +8,18 @@ multiple output destinations, and custom log formats.
 
 import sys
 import copy
+import atexit
 from datetime import datetime
 from functools import wraps
 from pathlib import Path
+from types import TracebackType
 from typing import (
     Any,
     Callable,
     Dict,
     List,
     Optional,
+    Type,
     TypeVar,
     Union,
     cast,
@@ -96,6 +99,7 @@ class EnterpriseLogger:
     _instance: Optional["EnterpriseLogger"] = None
     _initialized: bool = False
     _context_var: Dict[str, Any] = {}
+    _handler_ids: List[int] = []  # Track handler IDs for cleanup
 
     def __new__(cls, *args: Any, **kwargs: Any) -> "EnterpriseLogger":
         """Singleton pattern implementation."""
@@ -117,30 +121,69 @@ class EnterpriseLogger:
         self._configure_logger()
         self._initialized = True
 
+    def __enter__(self) -> "EnterpriseLogger":
+        """Context manager entry.
+
+        Returns:
+            Self for use in context manager
+        """
+        return self
+
+    def __exit__(
+        self,
+        exc_type: Optional[Type[BaseException]],
+        exc_val: Optional[BaseException],
+        exc_tb: Optional[TracebackType],
+    ) -> None:
+        """Context manager exit with cleanup.
+
+        Args:
+            exc_type: Exception type if an exception was raised in the context
+            exc_val: Exception value if an exception was raised in the context
+            exc_tb: Exception traceback if an exception was raised in the context
+        """
+        self.shutdown()
+
     def _load_config_from_system(self) -> LoggerConfig:
         """Load logger configuration from the system configuration."""
         # In a real implementation, you would load from your config system
         # For now, we'll use default values
         return LoggerConfig()
 
+    def _cleanup_handlers(self) -> None:
+        """Remove all registered handlers safely."""
+        # Create a copy of the list since we'll be modifying it
+        handler_ids = self._handler_ids.copy()
+        self._handler_ids.clear()
+
+        # Remove each handler, ignoring errors for handlers that no longer exist
+        for handler_id in handler_ids:
+            try:
+                _logger.remove(handler_id)
+            except ValueError:
+                # Handler already removed, just continue
+                pass
+
     def _configure_logger(self) -> None:
         """Configure the loguru logger with our settings."""
-        # Remove default handlers
-        _logger.remove()
+        # Remove existing handlers and clear handler IDs
+        self._cleanup_handlers()
+        _logger.remove()  # Remove any default handlers
 
         # Add console handler
-        _logger.add(
+        console_handler_id = _logger.add(
             sys.stderr,
             level=self._logger_config.console_level,
             format=self._logger_config.format,
             colorize=True,
         )
+        self._handler_ids.append(console_handler_id)
 
         # Add file handler
         current_time = datetime.now().strftime("%Y%m%d_%H%M%S")
         log_file = self._logger_config.log_dir / f"enterprise_ai_{current_time}.log"
 
-        _logger.add(
+        file_handler_id = _logger.add(
             log_file,
             level=self._logger_config.file_level,
             format=self._logger_config.format,
@@ -148,6 +191,7 @@ class EnterpriseLogger:
             retention=self._logger_config.retention,
             compression="zip",
         )
+        self._handler_ids.append(file_handler_id)
 
     def get_logger(self, name: str) -> LoguruLogger:
         """Get a logger for a specific component.
@@ -290,8 +334,11 @@ class EnterpriseLogger:
             new_config: New configuration for the logger
         """
         self._logger_config = new_config
-        _logger.remove()  # Remove all handlers
-        self._configure_logger()  # Reconfigure
+        self._configure_logger()  # This now handles cleanup internally
+
+    def shutdown(self) -> None:
+        """Clean up resources and handlers when shutting down."""
+        self._cleanup_handlers()
 
 
 # Determine if a function is a coroutine function (for trace_execution)
@@ -337,6 +384,23 @@ def asyncio_iscoroutinefunction(func: Callable) -> bool:
 # Create global logger instance
 logger_instance = EnterpriseLogger()
 
+
+# Global shutdown function for cleanup at application exit
+def shutdown_logging() -> None:
+    """Clean up all logging resources."""
+    try:
+        global logger_instance
+        if logger_instance is not None:
+            logger_instance.shutdown()
+    except Exception:
+        # Suppress exceptions during shutdown to avoid error messages
+        pass
+
+
+# Register shutdown function with atexit
+atexit.register(shutdown_logging)
+
+
 # Export common log functions directly
 debug = _logger.debug
 info = _logger.info
@@ -360,6 +424,9 @@ get_team_logger = logger_instance.get_team_logger
 # Export execution tracing
 trace_execution = logger_instance.trace_execution
 
+# Export shutdown function
+shutdown = shutdown_logging
+
 
 if __name__ == "__main__":
     # Simple test if module is run directly
@@ -380,3 +447,6 @@ if __name__ == "__main__":
         _logger.info("This message has context")
 
     test_context()
+
+    # Test automatic cleanup at exit
+    # At this point, shutdown_logging will be called automatically
