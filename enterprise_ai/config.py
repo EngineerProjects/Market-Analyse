@@ -297,7 +297,7 @@ class Config:
 
         return target_file
 
-    def _load_config_from_file(self, config_path: Path) -> dict:
+    def _load_config_from_file(self, config_path: Path) -> Dict[Any, Any]:
         """Load configuration based on file extension.
 
         Args:
@@ -313,27 +313,29 @@ class Config:
                     raise ImportError(
                         "PyYAML is required to parse YAML files. Install with 'pip install PyYAML'"
                     )
-                # Convert to string for yaml.safe_load
                 content = f.read().decode("utf-8")
                 result = yaml.safe_load(content)
-                return result or {}
+                return cast(Dict[Any, Any], result or {})
             elif config_path.suffix.lower() == ".toml":
                 if tomli is None:
                     raise ImportError(
                         "tomli is required to parse TOML files. Install with 'pip install tomli'"
                     )
-                return tomli.load(f)
+                return cast(Dict[Any, Any], tomli.load(f))
             else:
                 raise ValueError(f"Unsupported configuration file format: {config_path.suffix}")
 
-    def _load_config(self) -> dict:
+    def _load_config(self) -> Dict[Any, Any]:
         """Load configuration from file.
 
         Returns:
             Dictionary with configuration values
         """
         config_path = self._get_config_path()
-        return self._load_config_from_file(config_path)
+        result = self._load_config_from_file(config_path)
+        if not isinstance(result, dict):
+            return {}
+        return cast(Dict[Any, Any], result)
 
     def _load_initial_config(self) -> None:
         """Initialize configuration from file or defaults."""
