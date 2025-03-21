@@ -101,11 +101,11 @@ def process_data():
 @with_context(operation="outer_operation")
 def outer_function():
     info("Outer function log")  # Includes outer_operation
-    
+
     @with_context(sub_operation="inner_operation")
     def inner_function():
         info("Inner function log")  # Includes outer_operation and inner_operation
-    
+
     inner_function()
 ```
 
@@ -164,20 +164,22 @@ The logging system is designed to integrate with the Enterprise AI configuration
 
 1. **Use Appropriate Log Levels**: Reserve `debug` for detailed information and `info` for standard operational messages.
 
-2. **Include Context**: Always include relevant context in log messages, such as agent IDs, task IDs, etc.
+1. **Include Context**: Always include relevant context in log messages, such as agent IDs, task IDs, etc.
 
-3. **Structured Messages**: Use named placeholders for better readability and structure.
+1. **Structured Messages**: Use named placeholders for better readability and structure.
+
    ```python
    logger.info("Processing {task} with {params}", task=task_id, params=parameters)
    ```
 
-4. **Log Exceptions**: Always log exceptions with the `exception` method to include traceback information.
+1. **Log Exceptions**: Always log exceptions with the `exception` method to include traceback information.
 
-5. **Use Component Loggers**: Create specific loggers for different components to make log filtering easier.
+1. **Use Component Loggers**: Create specific loggers for different components to make log filtering easier.
 
-6. **Sensitive Information**: Never log sensitive information such as API keys or user credentials.
+1. **Sensitive Information**: Never log sensitive information such as API keys or user credentials.
 
-7. **Performance Consideration**: Use lazy evaluation for expensive operations:
+1. **Performance Consideration**: Use lazy evaluation for expensive operations:
+
    ```python
    # This will only be evaluated if the DEBUG level is enabled
    logger.debug("Expensive calculation: {result}", result=lambda: expensive_calculation())

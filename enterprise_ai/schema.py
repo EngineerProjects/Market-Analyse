@@ -14,12 +14,13 @@ from typing import Any, Dict, List, Literal, Optional, Union, TypeVar, cast
 from pydantic import BaseModel, Field, model_validator
 
 # Type variable for generic typing
-T = TypeVar('T')
+T = TypeVar("T")
 
 
 # Role and Agent Type Definitions
 class Role(str, Enum):
     """Message role options for conversation interactions."""
+
     SYSTEM = "system"
     USER = "user"
     ASSISTANT = "assistant"
@@ -29,6 +30,7 @@ class Role(str, Enum):
 
 class AgentRole(str, Enum):
     """Agent role types for team hierarchies."""
+
     MANAGER = "manager"
     DEVELOPER = "developer"
     RESEARCHER = "researcher"
@@ -46,12 +48,14 @@ ROLE_TYPE = Role  # Using the Enum directly instead of Literal
 # Tool and Function Call Schemas
 class Function(BaseModel):
     """Represents a function definition in a tool call."""
+
     name: str
     arguments: str
 
 
 class ToolCall(BaseModel):
     """Represents a tool/function call in a message."""
+
     id: str
     type: str = "function"
     function: Function
@@ -60,6 +64,7 @@ class ToolCall(BaseModel):
 # Choice options for tool usage
 class ToolChoice(str, Enum):
     """Tool choice options for LLM interactions."""
+
     NONE = "none"
     AUTO = "auto"
     REQUIRED = "required"
@@ -72,6 +77,7 @@ TOOL_CHOICE_TYPE = Literal[TOOL_CHOICE_VALUES]  # type: ignore
 # Execution States
 class AgentState(str, Enum):
     """Agent execution states."""
+
     IDLE = "IDLE"
     RUNNING = "RUNNING"
     THINKING = "THINKING"
@@ -85,6 +91,7 @@ class AgentState(str, Enum):
 # Team states
 class TeamState(str, Enum):
     """Team execution states."""
+
     IDLE = "IDLE"
     PLANNING = "PLANNING"
     EXECUTING = "EXECUTING"
@@ -96,6 +103,7 @@ class TeamState(str, Enum):
 # Task states
 class TaskState(str, Enum):
     """Task execution states."""
+
     PENDING = "PENDING"
     ASSIGNED = "ASSIGNED"
     IN_PROGRESS = "IN_PROGRESS"
@@ -108,6 +116,7 @@ class TaskState(str, Enum):
 # Messages
 class Message(BaseModel):
     """Represents a chat message in the conversation."""
+
     role: Role
     content: Optional[str] = Field(default=None)
     tool_calls: Optional[List[ToolCall]] = Field(default=None)
@@ -116,7 +125,7 @@ class Message(BaseModel):
     base64_image: Optional[str] = Field(default=None)
     timestamp: Optional[datetime] = Field(default_factory=datetime.now)
     metadata: Optional[Dict[str, Any]] = Field(default_factory=lambda: {})
-    
+
     def __add__(self, other: Union[List["Message"], "Message"]) -> List["Message"]:
         """Support Message + list or Message + Message operations."""
         if isinstance(other, list):
@@ -175,7 +184,12 @@ class Message(BaseModel):
 
     @classmethod
     def tool_message(
-        cls, content: str, name: str, tool_call_id: str, base64_image: Optional[str] = None, **kwargs: Any
+        cls,
+        content: str,
+        name: str,
+        tool_call_id: str,
+        base64_image: Optional[str] = None,
+        **kwargs: Any,
     ) -> "Message":
         """Create a tool message."""
         return cls(
@@ -186,7 +200,7 @@ class Message(BaseModel):
             base64_image=base64_image,
             **kwargs,
         )
-    
+
     @classmethod
     def agent_message(
         cls, content: str, name: str, base64_image: Optional[str] = None, **kwargs: Any
@@ -212,22 +226,19 @@ class Message(BaseModel):
         formatted_calls = [
             ToolCall(
                 id=call.id,
-                function=Function(
-                    name=call.function.name,
-                    arguments=call.function.arguments
-                ),
-                type="function"
+                function=Function(name=call.function.name, arguments=call.function.arguments),
+                type="function",
             )
             for call in tool_calls
         ]
-        
+
         # Convert content to string if it's a list
         final_content: Optional[str] = None
         if isinstance(content, list):
             final_content = "\n".join(content)
         else:
             final_content = content
-            
+
         return cls(
             role=Role.ASSISTANT,
             content=final_content,
@@ -239,6 +250,7 @@ class Message(BaseModel):
 
 class Memory(BaseModel):
     """Memory store for agent messages."""
+
     messages: List[Message] = Field(default_factory=list)
     max_messages: int = Field(default=100)
     metadata: Dict[str, Any] = Field(default_factory=lambda: {})
@@ -248,14 +260,14 @@ class Memory(BaseModel):
         self.messages.append(message)
         # Optional: Implement message limit
         if len(self.messages) > self.max_messages:
-            self.messages = self.messages[-self.max_messages:]
+            self.messages = self.messages[-self.max_messages :]
 
     def add_messages(self, messages: List[Message]) -> None:
         """Add multiple messages to memory."""
         self.messages.extend(messages)
         # Check for message limit
         if len(self.messages) > self.max_messages:
-            self.messages = self.messages[-self.max_messages:]
+            self.messages = self.messages[-self.max_messages :]
 
     def clear(self) -> None:
         """Clear all messages."""
@@ -273,22 +285,30 @@ class Memory(BaseModel):
 # Agent and Team Schemas
 class AgentProfile(BaseModel):
     """Profile information for an agent."""
+
     name: str = Field(..., description="Unique name of the agent")
     role: str = Field(..., description="Role of the agent (from AgentRole enum)")
     description: Optional[str] = Field(None, description="Description of the agent")
     capabilities: List[str] = Field(default_factory=list, description="List of agent capabilities")
-    specialties: List[str] = Field(default_factory=list, description="Areas of specialty for the agent")
+    specialties: List[str] = Field(
+        default_factory=list, description="Areas of specialty for the agent"
+    )
     system_prompt: Optional[str] = Field(None, description="System-level instruction prompt")
 
 
 class AgentConfig(BaseModel):
     """Configuration for an agent instance."""
+
     profile: AgentProfile
     model_name: str = Field("default", description="Name of LLM model to use")
     max_steps: int = Field(10, description="Maximum steps before termination")
-    tools: List[str] = Field(default_factory=list, description="List of tool names available to agent")
-    allowed_tools: List[str] = Field(default_factory=list, description="List of tool names the agent is allowed to use")
-    
+    tools: List[str] = Field(
+        default_factory=list, description="List of tool names available to agent"
+    )
+    allowed_tools: List[str] = Field(
+        default_factory=list, description="List of tool names the agent is allowed to use"
+    )
+
     @model_validator(mode="after")
     def validate_tools(self) -> "AgentConfig":
         """Validate tool configurations."""
@@ -299,6 +319,7 @@ class AgentConfig(BaseModel):
 
 class TaskDefinition(BaseModel):
     """Definition of a task to be performed by an agent or team."""
+
     id: str = Field(..., description="Unique task identifier")
     title: str = Field(..., description="Short task title")
     description: str = Field(..., description="Detailed task description")
@@ -308,18 +329,21 @@ class TaskDefinition(BaseModel):
     deadline: Optional[datetime] = Field(None, description="Deadline for task completion")
     parent_task: Optional[str] = Field(None, description="Parent task ID if this is a subtask")
     subtasks: List[str] = Field(default_factory=list, description="List of subtask IDs")
-    dependencies: List[str] = Field(default_factory=list, description="List of task IDs this task depends on")
+    dependencies: List[str] = Field(
+        default_factory=list, description="List of task IDs this task depends on"
+    )
     metadata: Dict[str, Any] = Field(default_factory=dict, description="Additional task metadata")
 
 
 class TeamConfig(BaseModel):
     """Configuration for a team of agents."""
+
     name: str = Field(..., description="Unique team name")
     description: Optional[str] = Field(None, description="Team description")
     manager: str = Field(..., description="Name of the manager agent")
     members: List[str] = Field(default_factory=list, description="List of team member agent names")
     max_size: int = Field(10, description="Maximum team size")
-    
+
     @model_validator(mode="after")
     def validate_team_size(self) -> "TeamConfig":
         """Validate team size constraints."""
