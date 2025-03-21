@@ -18,6 +18,7 @@ classifiers = [
 ]
 
 dependencies = [
+    "loguru>=0.7.3",
     "pydantic>=2.10.6",
     "pytest-cov>=6.0.0",
     "tomli>=2.2.1",
@@ -61,3 +62,8 @@ per-file-ignores = { "tests/*" = ["E501"] }
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
+
+[dependency-groups]
+dev = [
+    "pytest-asyncio>=0.25.3",
+]
