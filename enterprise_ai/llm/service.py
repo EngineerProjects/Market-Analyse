@@ -25,7 +25,7 @@ from typing import (
 )
 
 from enterprise_ai.schema import Message, Role
-from enterprise_ai.config import config
+from enterprise_ai.config import Config, config as default_config
 from enterprise_ai.exceptions import LLMError, ModelNotAvailable
 from enterprise_ai.logger import get_logger, trace_execution
 
@@ -69,29 +69,51 @@ class LLMService:
         self,
         provider_name: Optional[str] = None,
         model_name: Optional[str] = None,
+        api_key: Optional[str] = None,
+        api_base: Optional[str] = None,
+        api_version: Optional[str] = None,
+        temperature: Optional[float] = None,
+        max_tokens: Optional[int] = None,
+        organization: Optional[str] = None,
+        config_path: Optional[str] = None,
         cache: Optional[Union[MemoryCache, DiskCache]] = None,
         retry_config: Optional[RetryConfig] = None,
         use_caching: bool = True,
-        validate_model: bool = True,
+        validate_model: bool = False,  # Changed from True to False
         strict_validation: bool = False,
         fallback_models: Optional[Dict[str, str]] = None,
+        model_capabilities: Optional[Dict[str, bool]] = None,  # New parameter
     ):
         """Initialize the LLM service.
 
         Args:
             provider_name: Provider to use (default: from config)
             model_name: Model to use (default: from config)
+            api_key: API key to use (overrides config)
+            api_base: API base URL to use (overrides config)
+            api_version: API version to use (overrides config)
+            temperature: Model temperature (overrides config)
+            max_tokens: Maximum tokens to generate (overrides config)
+            organization: Organization ID (for OpenAI, overrides config)
+            config_path: Path to a custom config file
             cache: Cache to use (default: module default cache)
             retry_config: Retry configuration (default: module default config)
             use_caching: Whether to use caching (default: True)
-            validate_model: Whether to validate the model with the API (default: True)
+            validate_model: Whether to validate the model with the API (default: False)
             strict_validation: Whether to raise an exception if model doesn't exist (default: False)
             fallback_models: Dictionary mapping of provider -> fallback model if main model unavailable
+            model_capabilities: Dictionary of model capabilities (vision, tools, etc.)
         """
+        # Initialize custom config if needed
+        if config_path:
+            config_instance = Config(config_path=config_path)
+        else:
+            config_instance = default_config
+
         # Get provider and model from config if not specified
         if provider_name is None or model_name is None:
             # Use default LLM configuration
-            llm_config = config.llm.get("default")
+            llm_config = config_instance.llm.get("default")
             if not llm_config:
                 raise LLMError("No default LLM configuration found")
 
@@ -106,11 +128,26 @@ class LLMService:
         self.fallback_models = fallback_models or {}
         self.validate_model = validate_model
         self.strict_validation = strict_validation
+        self.model_capabilities = model_capabilities
+
+        # Store the direct parameters for provider creation
+        self.direct_params = {
+            "api_key": api_key,
+            "api_base": api_base,
+            "api_version": api_version,
+            "temperature": temperature,
+            "max_tokens": max_tokens,
+            "organization": organization,
+        }
+
+        # Remove None values to allow fallback to config values
+        self.direct_params = {k: v for k, v in self.direct_params.items() if v is not None}
 
         # Track model validation status
         self._model_validated = False
         self._available_models: Optional[List[str]] = None
         self._model_capabilities: Optional[Dict[str, bool]] = None
+        self._config_instance = config_instance
 
         # Initialize the provider
         self.provider = self._create_provider(self.provider_name, self.model_name)
@@ -138,7 +175,9 @@ class LLMService:
             raise ProviderNotSupportedError(provider_name)
 
         # Get provider-specific configuration
-        provider_config = config.llm.get(provider_name, config.llm.get("default"))
+        provider_config = self._config_instance.llm.get(
+            provider_name, self._config_instance.llm.get("default")
+        )
 
         # Create provider configuration with safe access
         provider_config_dict: Dict[str, Any] = {}
@@ -154,9 +193,20 @@ class LLMService:
             if provider_name == "openai" and hasattr(provider_config, "organization"):
                 provider_config_dict["organization"] = provider_config.organization
 
+            # Add API version if available
+            if hasattr(provider_config, "api_version"):
+                provider_config_dict["api_version"] = provider_config.api_version
+
+        # Override config values with direct parameters
+        provider_config_dict.update(self.direct_params)
+
         # Add validation parameters
         provider_config_dict["validate_model"] = self.validate_model
         provider_config_dict["strict_validation"] = self.strict_validation
+
+        # Add model capabilities if specified for Ollama
+        if provider_name == "ollama" and self.model_capabilities is not None:
+            provider_config_dict["known_capabilities"] = self.model_capabilities
 
         # Create provider instance with appropriate configuration
         if provider_name == "openai":
@@ -168,6 +218,8 @@ class LLMService:
         else:
             # This should never happen due to the earlier check
             raise ProviderNotSupportedError(provider_name)
+
+    # The rest of the methods remain the same...
 
     def get_available_models(self) -> List[str]:
         """Get a list of available models from the current provider.
@@ -715,16 +767,8 @@ class LLMService:
             return False
 
 
-# Create project workspace cache directory
-workspace_cache_dir = config.workspace_root / "cache" / "llm"
-workspace_cache_dir.mkdir(parents=True, exist_ok=True)
-
-# Create disk cache for persistent storage
-disk_cache = DiskCache(
-    cache_dir=workspace_cache_dir,
-    ttl=86400,  # 24 hours
-    max_size_mb=500,  # 500 MB
-)
+# Global variable to store the default service instance
+_default_llm_service: Optional[LLMService] = None
 
 # Define fallback models for each provider
 DEFAULT_FALLBACK_MODELS = {
@@ -733,13 +777,66 @@ DEFAULT_FALLBACK_MODELS = {
     "ollama": "llama3",  # Fallback to Llama 3 base model
 }
 
-# Default LLM service instance with fallbacks
-default_llm_service = LLMService(
-    cache=disk_cache,
-    use_caching=True,
-    retry_config=DEFAULT_RETRY_CONFIG,
-    fallback_models=DEFAULT_FALLBACK_MODELS,
-)
+
+class DefaultServiceProxy:
+    """Proxy for the default LLM service that lazily initializes it."""
+
+    def __getattr__(self, name: str) -> Any:
+        """Forward attribute access to the real service.
+
+        Args:
+            name: Attribute name to access
+
+        Returns:
+            The requested attribute from the default service
+        """
+        return getattr(get_default_llm_service(), name)
+
+    def __call__(self, *args: Any, **kwargs: Any) -> LLMService:
+        """Return the actual LLMService instance when called.
+
+        This allows code to use default_llm_service() to get the real service.
+
+        Returns:
+            The default LLM service instance
+        """
+        return get_default_llm_service()
+
+
+# For backward compatibility with existing imports
+default_llm_service = DefaultServiceProxy()
+
+
+def get_default_llm_service() -> LLMService:
+    """Get or create the default LLM service.
+
+    This function lazily initializes the default LLM service when first needed.
+
+    Returns:
+        The default LLM service instance
+    """
+    global _default_llm_service
+    if _default_llm_service is None:
+        # Create workspace cache directory
+        workspace_cache_dir = default_config.workspace_root / "cache" / "llm"
+        workspace_cache_dir.mkdir(parents=True, exist_ok=True)
+
+        # Create disk cache for persistent storage
+        disk_cache = DiskCache(
+            cache_dir=workspace_cache_dir,
+            ttl=86400,  # 24 hours
+            max_size_mb=500,  # 500 MB
+        )
+
+        # Create default service
+        _default_llm_service = LLMService(
+            cache=disk_cache,
+            use_caching=True,
+            retry_config=DEFAULT_RETRY_CONFIG,
+            fallback_models=DEFAULT_FALLBACK_MODELS,
+        )
+
+    return _default_llm_service
 
 
 # Helper functions to use the default service
@@ -753,7 +850,7 @@ def complete(messages: List[Message], **kwargs: Any) -> Message:
     Returns:
         Generated completion message
     """
-    return cast(Message, default_llm_service.complete(messages, **kwargs))
+    return cast(Message, get_default_llm_service().complete(messages, **kwargs))
 
 
 def complete_stream(messages: List[Message], **kwargs: Any) -> Generator[Message, None, None]:
@@ -767,7 +864,8 @@ def complete_stream(messages: List[Message], **kwargs: Any) -> Generator[Message
         Generator yielding partial completion messages
     """
     return cast(
-        Generator[Message, None, None], default_llm_service.complete_stream(messages, **kwargs)
+        Generator[Message, None, None],
+        get_default_llm_service().complete_stream(messages, **kwargs),
     )
 
 
@@ -781,7 +879,7 @@ async def acomplete(messages: List[Message], **kwargs: Any) -> Message:
     Returns:
         Generated completion message
     """
-    return cast(Message, await default_llm_service.acomplete(messages, **kwargs))
+    return cast(Message, await get_default_llm_service().acomplete(messages, **kwargs))
 
 
 async def acomplete_stream(messages: List[Message], **kwargs: Any) -> AsyncGenerator[Message, None]:
@@ -794,7 +892,7 @@ async def acomplete_stream(messages: List[Message], **kwargs: Any) -> AsyncGener
     Returns:
         Async generator yielding partial completion messages
     """
-    async for message in default_llm_service.acomplete_stream(messages, **kwargs):
+    async for message in get_default_llm_service().acomplete_stream(messages, **kwargs):
         yield message
 
 
@@ -810,14 +908,14 @@ def get_conversation_manager(
     Returns:
         ConversationManager instance
     """
-    return default_llm_service.get_conversation_manager(
+    return get_default_llm_service().get_conversation_manager(
         system_message=system_message, max_tokens=max_tokens
     )
 
 
 def clear_cache() -> None:
     """Clear the default LLM service cache."""
-    default_llm_service.clear_cache()
+    get_default_llm_service().clear_cache()
 
 
 def change_model(model_name: str, validate: bool = True) -> bool:
@@ -830,7 +928,7 @@ def change_model(model_name: str, validate: bool = True) -> bool:
     Returns:
         True if successful, False if model validation fails
     """
-    return default_llm_service.change_model(model_name, validate)
+    return get_default_llm_service().change_model(model_name, validate)
 
 
 def change_provider(
@@ -846,7 +944,7 @@ def change_provider(
     Returns:
         True if successful, False if provider or model validation fails
     """
-    return default_llm_service.change_provider(provider_name, model_name, validate)
+    return get_default_llm_service().change_provider(provider_name, model_name, validate)
 
 
 def get_available_models() -> List[str]:
@@ -855,7 +953,7 @@ def get_available_models() -> List[str]:
     Returns:
         List of available model names
     """
-    return default_llm_service.get_available_models()
+    return get_default_llm_service().get_available_models()
 
 
 def get_similar_models(model_name: str, max_suggestions: int = 3) -> List[str]:
@@ -868,4 +966,4 @@ def get_similar_models(model_name: str, max_suggestions: int = 3) -> List[str]:
     Returns:
         List of similar model names
     """
-    return default_llm_service.get_similar_models(model_name, max_suggestions)
+    return get_default_llm_service().get_similar_models(model_name, max_suggestions)

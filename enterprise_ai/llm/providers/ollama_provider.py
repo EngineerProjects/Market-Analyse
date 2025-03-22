@@ -44,8 +44,8 @@ class OllamaProvider(LLMProvider):
     """Provider implementation for Ollama models.
 
     This provider integrates with Ollama to provide access to a wide range of models
-    through a consistent interface. It dynamically detects model capabilities and adapts
-    to different model requirements and API formats.
+    through a consistent interface. It supports user-defined capability detection
+    and simplified model validation.
     """
 
     # Maximum token contexts for different model families (used as fallbacks)
@@ -54,7 +54,7 @@ class OllamaProvider(LLMProvider):
         "llama3": 8192,
         "llama3.1": 16384,
         "llama3.2": 32768,
-        "llama3.3": 131072,  # These are estimated - adjust based on actual values
+        "llama3.3": 131072,
         "mistral": 8192,
         "mixtral": 32768,
         "phi": 2048,
@@ -68,9 +68,9 @@ class OllamaProvider(LLMProvider):
         "deepseek-v": 32768,
         "deepseek-r": 131072,
     }
-    DEFAULT_CONTEXT_SIZE = 8192  # Increased default
+    DEFAULT_CONTEXT_SIZE = 8192
 
-    # Patterns for identifying model capabilities based on name
+    # Basic patterns for identifying model capabilities
     VISION_PATTERNS = [
         "llava",
         "bakllava",
@@ -86,22 +86,6 @@ class OllamaProvider(LLMProvider):
         "clip",
     ]
 
-    TOOL_PATTERNS = [
-        "llama",
-        "mistral",
-        "mixtral",
-        "openhermes",
-        "wizard",
-        "deepseek",
-        "phi",
-        "neural-chat",
-        "qwen",
-        "yi",
-        "vicuna",
-        "nous",
-        "orca",
-    ]
-
     def __init__(
         self,
         model_name: str,
@@ -109,8 +93,9 @@ class OllamaProvider(LLMProvider):
         request_timeout: float = 60.0,
         temperature: float = 0.7,
         max_tokens: Optional[int] = None,
-        validate_model: bool = True,
+        validate_model: bool = False,
         strict_validation: bool = False,
+        known_capabilities: Optional[Dict[str, bool]] = None,
         **kwargs: Any,
     ) -> None:
         """Initialize the Ollama provider.
@@ -123,6 +108,7 @@ class OllamaProvider(LLMProvider):
             max_tokens: Maximum tokens to generate (None uses Ollama's default)
             validate_model: Whether to validate if the model exists
             strict_validation: Whether to raise an exception if model doesn't exist
+            known_capabilities: Dictionary of model capabilities (vision, tools, etc.)
             **kwargs: Additional parameters to pass to Ollama API
         """
         self.model_name = model_name
@@ -131,10 +117,9 @@ class OllamaProvider(LLMProvider):
         self.temperature = temperature
         self.kwargs = kwargs
 
-        # Dynamic capability and model info cache
-        self._capabilities: Optional[Dict[str, bool]] = None
+        # Initialize capability information
+        self._model_capabilities = known_capabilities or None
         self._model_info: Optional[Dict[str, Any]] = None
-        self._api_version: Optional[str] = None
         self._available_models: Optional[List[str]] = None
         self._model_validated: bool = False
 
@@ -151,23 +136,7 @@ class OllamaProvider(LLMProvider):
 
         # Validate model if requested
         if validate_model:
-            model_exists = self.validate_model()
-            if not model_exists and strict_validation:
-                available = self.get_available_models()
-                suggestions = self._suggest_models(self.model_name, available)
-
-                suggestion_msg = ""
-                if suggestions:
-                    suggestion_msg = f" Did you mean one of these? {', '.join(suggestions)}"
-
-                raise ModelNotAvailable(
-                    self.model_name, f"Model not found in Ollama.{suggestion_msg}"
-                )
-            elif not model_exists:
-                logger.warning(
-                    f"Model '{self.model_name}' was not found in available Ollama models. "
-                    f"Make sure it's pulled or the name is correct."
-                )
+            self._validate_model(strict_validation)
 
     def get_model_name(self) -> str:
         """Get the model name.
@@ -207,39 +176,53 @@ class OllamaProvider(LLMProvider):
             logger.warning(f"Failed to fetch available models: {e}")
             return []
 
-    def validate_model(self) -> bool:
-        """Validate if the current model exists in Ollama.
+    def _validate_model(self, strict: bool = False) -> bool:
+        """Validate if the model exists in available models.
+
+        Args:
+            strict: Whether to raise an exception if model isn't found
 
         Returns:
-            True if the model exists, False otherwise
+            True if model is valid, False otherwise
         """
         if self._model_validated:
             return True
 
-        # First try to validate via the show endpoint (more reliable)
         try:
-            response = self.client.get("/api/show", params={"name": self.model_name})
-            if response.status_code == 200:
+            # Get available models
+            available_models = self.get_available_models()
+
+            # Check if exact model name exists
+            if self.model_name in available_models:
                 self._model_validated = True
-                # Also update model info since we have it
-                self._model_info = response.json()
                 return True
-        except Exception:
-            pass
 
-        # Fall back to checking available models list
-        available_models = self.get_available_models()
-        if self.model_name in available_models:
-            self._model_validated = True
-            return True
+            # Check for model base name without version tag
+            base_name = self.model_name.split(":")[0]
+            for model in available_models:
+                if model.startswith(f"{base_name}:") or model == base_name:
+                    self._model_validated = True
+                    return True
 
-        # Check if the model exists with a tag
-        model_base = self.model_name.split(":")[0] if ":" in self.model_name else self.model_name
-        if any(m.startswith(f"{model_base}:") for m in available_models):
-            self._model_validated = True
-            return True
+            if strict:
+                suggestions = self._suggest_models(self.model_name, available_models)
+                suggestion_msg = ""
+                if suggestions:
+                    suggestion_msg = f" Did you mean one of these? {', '.join(suggestions)}"
 
-        return False
+                raise ModelNotAvailable(
+                    self.model_name, f"Model not found in Ollama.{suggestion_msg}"
+                )
+
+            logger.warning(
+                f"Model '{self.model_name}' was not found in available Ollama models. "
+                f"Make sure it's pulled or the name is correct."
+            )
+            return False
+
+        except Exception as e:
+            logger.warning(f"Model validation error: {e}")
+            return True  # Assume model is valid if we can't check
 
     def _suggest_models(
         self, model_name: str, available_models: List[str], max_suggestions: int = 3
@@ -257,7 +240,7 @@ class OllamaProvider(LLMProvider):
         if not available_models:
             return []
 
-        # Simple suggestion based on prefix matching (more sophisticated methods could be used)
+        # Simple suggestion based on prefix matching
         base_name = model_name.split(":")[0] if ":" in model_name else model_name
 
         # First try exact base name matches
@@ -277,216 +260,53 @@ class OllamaProvider(LLMProvider):
 
         return partial_matches[:max_suggestions]
 
-    def _detect_api_version(self) -> str:
-        """Detect Ollama API version for compatibility handling.
-
-        Returns:
-            Semantic version string (or "latest" if detection fails)
-        """
-        if self._api_version is not None:
-            return self._api_version
-
-        try:
-            response = self.client.get("/api/version")
-            response.raise_for_status()
-            version_info = response.json()
-            version = str(version_info.get("version", "0.0.0"))
-            logger.debug(f"Detected Ollama version: {version}")
-            self._api_version = version
-            return version
-        except Exception as e:
-            logger.warning(f"Failed to detect Ollama version: {e}, assuming latest")
-            self._api_version = "latest"
-            return "latest"
-
-    def _discover_model_capabilities(self) -> Dict[str, bool]:
-        """Dynamically discover model capabilities by querying Ollama API.
+    def _detect_capabilities(self) -> Dict[str, bool]:
+        """Detect model capabilities based on model name or user-provided capabilities.
 
         Returns:
             Dictionary of capability flags
         """
-        if self._capabilities is not None:
-            return self._capabilities
+        # If capabilities are already set, return them
+        if self._model_capabilities is not None:
+            return self._model_capabilities
 
-        try:
-            # First, try to check if model info has already been fetched
-            if self._model_info is None:
-                # Query the model using the /api/show endpoint
-                response = self.client.get("/api/show", params={"name": self.model_name})
-                response.raise_for_status()
-                self._model_info = response.json()
+        # Try to get model information if available
+        if self._model_info is None:
+            try:
+                response = self.client.post("/api/show", json={"name": self.model_name})
+                if response.status_code == 200:
+                    self._model_info = response.json()
+            except Exception as e:
+                logger.debug(f"Unable to get model info: {e}")
 
-            # Extract model details
-            model_info = self._model_info
-            details = model_info.get("details", {})
+        # Default capabilities
+        capabilities = {
+            "vision": False,
+            "tools": True,  # Most modern models support tools
+            "chat_format": True,  # Most modern models support chat format
+        }
+
+        # Check for vision capability based on model name
+        model_name_lower = self.model_name.lower()
+        if any(pattern in model_name_lower for pattern in self.VISION_PATTERNS):
+            capabilities["vision"] = True
+
+        # Check model info for more capability hints if available
+        if self._model_info:
+            details = self._model_info.get("details", {})
             family = details.get("family", "").lower()
-            families = details.get("families", [])
-            if isinstance(families, list):
-                families = [f.lower() for f in families]
-            else:
-                families = []
 
-            # Get parameter size
-            parameter_size_str = details.get("parameter_size", "")
-            parameter_size = self._extract_parameter_size(parameter_size_str)
+            # Vision capability often mentioned in model family
+            if any(v in family for v in ["llava", "vision", "clip", "multimodal"]):
+                capabilities["vision"] = True
 
-            # Check for capability hints in parameter description
-            model_name_lower = self.model_name.lower()
+            # Template format can indicate chat capability
+            if "template" in self._model_info and self._model_info["template"]:
+                if "{{" in self._model_info["template"]:
+                    capabilities["chat_format"] = True
 
-            # Template info can indicate chat capability
-            chat_format = False
-            if "template" in model_info and model_info["template"]:
-                chat_format = "{{" in model_info["template"]
-
-            # Determine capabilities based on model info and name
-            vision_capability = (
-                # Check for vision in family or families
-                any(v in family for v in ["llava", "vision", "clip", "multimodal"])
-                or any(
-                    any(v in f for f in families) for v in ["llava", "vision", "clip", "multimodal"]
-                )
-                or
-                # Check for vision in model name
-                any(v in model_name_lower for v in self.VISION_PATTERNS)
-                or
-                # Parameter size description sometimes contains vision info
-                any(
-                    v in parameter_size_str.lower()
-                    for v in ["vision", "multimodal", "vl", "visual"]
-                )
-            )
-
-            # Tool capability is more common in larger models and specific families
-            tools_capability = (
-                # Check for tool-capable families
-                any(t in family for t in ["llama", "mistral", "mixtral", "wizard"])
-                or any(
-                    any(t in f for f in families) for t in ["llama", "mistral", "mixtral", "wizard"]
-                )
-                or
-                # Check model name patterns
-                any(t in model_name_lower for t in self.TOOL_PATTERNS)
-                or
-                # Larger models (>7B) are more likely to support tools
-                parameter_size >= 7000000000
-            )
-
-            # Store and return capabilities
-            capabilities = {
-                "vision": vision_capability,
-                "tools": tools_capability,
-                "chat_format": chat_format,
-            }
-
-            self._capabilities = capabilities
-            return capabilities
-
-        except Exception as e:
-            logger.warning(f"Failed to discover model capabilities: {e}")
-            # Default fallback capabilities based on model name
-            model_name_lower = self.model_name.lower()
-
-            # More aggressive fallback detection
-            vision_capable = any(v in model_name_lower for v in self.VISION_PATTERNS)
-
-            # Look for model size indicators that suggest advanced capabilities
-            parameter_size = self._extract_parameter_size_from_name(model_name_lower)
-
-            # Models 7B and larger are more likely to support tools
-            tools_capable = (
-                any(t in model_name_lower for t in self.TOOL_PATTERNS)
-                or parameter_size >= 7000000000
-            )
-
-            fallback = {
-                "vision": vision_capable,
-                "tools": tools_capable,
-                "chat_format": True,  # Most modern models support chat format
-            }
-
-            self._capabilities = fallback
-            return fallback
-
-    def _extract_parameter_size(self, size_str: str) -> int:
-        """Extract parameter size in number of parameters from a string description.
-
-        Args:
-            size_str: String describing parameter size (e.g. "7B", "13B")
-
-        Returns:
-            Number of parameters as integer
-        """
-        try:
-            # Look for patterns like "7B", "13B", "70b", etc.
-            match = re.search(r"(\d+(?:\.\d+)?)([bmtq])", size_str.lower())
-            if match:
-                value = float(match.group(1))
-                unit = match.group(2)
-
-                if unit == "b":
-                    return int(value * 1_000_000_000)
-                elif unit == "m":
-                    return int(value * 1_000_000)
-                elif unit == "t":
-                    return int(value * 1_000_000_000_000)
-                elif unit == "q":
-                    return int(value * 1_000_000_000_000_000)
-
-            # Try to extract just numbers if they're large enough
-            number_match = re.search(r"(\d+)", size_str)
-            if number_match:
-                value = int(number_match.group(1))
-                if value > 1000:  # Likely millions or billions
-                    return value * 1_000_000  # Assume millions if it's a large number
-        except Exception:
-            pass
-
-        return 0  # Default if parsing fails
-
-    def _extract_parameter_size_from_name(self, model_name: str) -> int:
-        """Extract parameter size from model name.
-
-        Args:
-            model_name: Name of the model (e.g. "llama2:7b", "llama3:70b")
-
-        Returns:
-            Estimated number of parameters
-        """
-        try:
-            # Extract size indicators like 7b, 13b, 70b
-            size_match = re.search(r"[:\-_](\d+(?:\.\d+)?)([bmtq])", model_name.lower())
-            if size_match:
-                value = float(size_match.group(1))
-                unit = size_match.group(2)
-
-                if unit == "b":
-                    return int(value * 1_000_000_000)
-                elif unit == "m":
-                    return int(value * 1_000_000)
-                elif unit == "t":
-                    return int(value * 1_000_000_000_000)
-                elif unit == "q":
-                    return int(value * 1_000_000_000_000_000)
-
-            # Check for specific model family sizes (these are approximations)
-            if "phi4-mini" in model_name:
-                return 3_400_000_000  # 3.4B
-            elif "phi3-mini" in model_name:
-                return 3_800_000_000  # 3.8B
-            elif "phi3" in model_name:
-                return 14_000_000_000  # 14B
-            elif "phi2" in model_name:
-                return 2_700_000_000  # 2.7B
-            elif "mixtral-8x7b" in model_name or "mixtral:8x7b" in model_name:
-                return 47_000_000_000  # 8x7B = 56B effective parameters
-            elif "mixtral-8x22b" in model_name or "mixtral:8x22b" in model_name:
-                return 176_000_000_000  # 8x22B
-            elif "deepseek-coder" in model_name and "33b" not in model_name:
-                return 16_000_000_000  # 16B is common size
-        except Exception:
-            pass
-
-        return 0  # Default if extraction fails
+        self._model_capabilities = capabilities
+        return capabilities
 
     def _prepare_messages(self, messages: List[Message]) -> Union[str, Dict[str, Any]]:
         """Convert our Message objects to Ollama API format.
@@ -497,24 +317,13 @@ class OllamaProvider(LLMProvider):
         Returns:
             Formatted string for Ollama prompt or chat messages dict
         """
-        # First try to get model info to check if it supports chat format
-        try:
-            if self._capabilities is None:
-                self._discover_model_capabilities()
+        # Check capabilities
+        capabilities = self._detect_capabilities()
+        use_chat_format = capabilities.get("chat_format", True)
 
-            # Default to chat format if capabilities haven't been determined
-            use_chat_format = True
-            if self._capabilities is not None:
-                use_chat_format = self._capabilities.get("chat_format", True)
-
-            if use_chat_format:
-                return self._prepare_chat_messages(messages)
-
-            # Default to legacy prompt format
-            return self._prepare_legacy_prompt(messages)
-
-        except Exception as e:
-            logger.warning(f"Failed to check model capabilities, using legacy format: {e}")
+        if use_chat_format:
+            return self._prepare_chat_messages(messages)
+        else:
             return self._prepare_legacy_prompt(messages)
 
     def _convert_role(self, role: Role) -> str:
@@ -777,50 +586,6 @@ class OllamaProvider(LLMProvider):
 
         return request_params
 
-    def _try_with_formats(
-        self, messages: List[Message], endpoint: str, params: Dict[str, Any]
-    ) -> Dict[str, Any]:
-        """Try multiple formats and return the first successful response.
-
-        Args:
-            messages: Message list to send
-            endpoint: API endpoint
-            params: Request parameters
-
-        Returns:
-            API response
-
-        Raises:
-            Exception from the last attempt if all attempts fail
-        """
-        exceptions = []
-
-        # Try chat format first if we think it's supported
-        if self._capabilities is None:
-            self._discover_model_capabilities()
-
-        # Default to True if capabilities not determined
-        use_chat_first = True
-        if self._capabilities is not None:
-            use_chat_first = self._capabilities.get("chat_format", True)
-
-        attempts = [
-            # First attempt based on detected capabilities
-            lambda: self._make_request(endpoint, messages, params, use_chat=use_chat_first),
-            # Second attempt with opposite format
-            lambda: self._make_request(endpoint, messages, params, use_chat=not use_chat_first),
-        ]
-
-        for attempt_func in attempts:
-            try:
-                return attempt_func()
-            except Exception as e:
-                exceptions.append(e)
-                logger.warning(f"Request format attempt failed: {e}")
-
-        # All attempts failed, raise the last exception
-        raise exceptions[-1]
-
     def _make_request(
         self, endpoint: str, messages: List[Message], params: Dict[str, Any], use_chat: bool
     ) -> Dict[str, Any]:
@@ -880,8 +645,17 @@ class OllamaProvider(LLMProvider):
             # Remove stream parameter if present (we'll handle it separately)
             request_params.pop("stream", None)
 
-            # Try multiple formats if needed
-            response = self._try_with_formats(messages, "/api/chat", request_params)
+            # Check capabilities for API format
+            capabilities = self._detect_capabilities()
+            use_chat = capabilities.get("chat_format", True)
+
+            # Make the request
+            if use_chat:
+                endpoint = "/api/chat"
+            else:
+                endpoint = "/api/generate"
+
+            response = self._make_request(endpoint, messages, request_params, use_chat)
 
             # Convert to Message object
             return self._convert_completion_to_message(response, full_response=True)
@@ -958,12 +732,8 @@ class OllamaProvider(LLMProvider):
             request_params = self._prepare_request_parameters(params)
 
             # Determine if we should use chat or generate endpoint
-            use_chat = True
-            if self._capabilities is None:
-                self._discover_model_capabilities()
-
-            if self._capabilities is not None:
-                use_chat = self._capabilities.get("chat_format", True)
+            capabilities = self._detect_capabilities()
+            use_chat = capabilities.get("chat_format", True)
 
             endpoint = "/api/chat" if use_chat else "/api/generate"
 
@@ -1094,12 +864,8 @@ class OllamaProvider(LLMProvider):
             request_params.pop("stream", None)
 
             # Determine if we should use chat or generate endpoint
-            use_chat = True
-            if self._capabilities is None:
-                self._discover_model_capabilities()
-
-            if self._capabilities is not None:
-                use_chat = self._capabilities.get("chat_format", True)
+            capabilities = self._detect_capabilities()
+            use_chat = capabilities.get("chat_format", True)
 
             endpoint = "/api/chat" if use_chat else "/api/generate"
 
@@ -1193,12 +959,8 @@ class OllamaProvider(LLMProvider):
         async def stream_generator() -> AsyncGenerator[Message, None]:
             try:
                 # Determine if we should use chat or generate endpoint
-                use_chat = True
-                if self._capabilities is None:
-                    self._discover_model_capabilities()
-
-                if self._capabilities is not None:
-                    use_chat = self._capabilities.get("chat_format", True)
+                capabilities = self._detect_capabilities()
+                use_chat = capabilities.get("chat_format", True)
 
                 endpoint = "/api/chat" if use_chat else "/api/generate"
 
@@ -1335,7 +1097,7 @@ class OllamaProvider(LLMProvider):
         """
         # Try to get context size from model info
         if self._model_info and "details" in self._model_info:
-            details = self._model_info["details"]
+            _ = self._model_info["details"]
 
             # First check if there's a context window explicitly specified
             if "model_info" in self._model_info:
@@ -1351,18 +1113,6 @@ class OllamaProvider(LLMProvider):
                             return int(model_info[key])
                         except (ValueError, TypeError):
                             pass
-
-            # Try to extract context size from parameter_size
-            if "parameter_size" in details:
-                param_size = details["parameter_size"]
-                if isinstance(param_size, str):
-                    # Look for context window in parameter size (e.g. "7B-32K")
-                    try:
-                        context_match = re.search(r"(\d+)[kK]", param_size)
-                        if context_match:
-                            return int(context_match.group(1)) * 1024
-                    except Exception:
-                        pass
 
         # Extract from model name if possible
         model_name_lower = self.model_name.lower()
@@ -1385,20 +1135,8 @@ class OllamaProvider(LLMProvider):
         Returns:
             True if vision is supported, False otherwise
         """
-        # First check model name for known vision models (fast path)
-        model_name_lower = self.model_name.lower()
-        if any(pattern in model_name_lower for pattern in self.VISION_PATTERNS):
-            return True
-
-        # Then do API-based capability discovery
-        if self._capabilities is None:
-            self._discover_model_capabilities()
-
-        if self._capabilities is not None:
-            return self._capabilities.get("vision", False)
-
-        # Default fallback if capabilities couldn't be determined
-        return False
+        capabilities = self._detect_capabilities()
+        return capabilities.get("vision", False)
 
     def supports_tools(self) -> bool:
         """Check if the provider/model supports tool/function calling.
@@ -1406,20 +1144,5 @@ class OllamaProvider(LLMProvider):
         Returns:
             True if tool calling is supported, False otherwise
         """
-        # For larger models (typically 7B+), assume tool support for most modern architectures
-        parameter_size = self._extract_parameter_size_from_name(self.model_name.lower())
-        if parameter_size >= 7_000_000_000:  # 7B or larger
-            # First check model name for known tool-supporting models
-            model_name_lower = self.model_name.lower()
-            if any(pattern in model_name_lower for pattern in self.TOOL_PATTERNS):
-                return True
-
-        # Then do API-based capability discovery
-        if self._capabilities is None:
-            self._discover_model_capabilities()
-
-        if self._capabilities is not None:
-            return self._capabilities.get("tools", False)
-
-        # Default fallback if capabilities couldn't be determined
-        return False
+        capabilities = self._detect_capabilities()
+        return capabilities.get("tools", True)  # Most modern models support tools
