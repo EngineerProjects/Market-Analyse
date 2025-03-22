@@ -6,6 +6,7 @@ This module implements the LLMProvider interface for Anthropic's Claude models.
 
 import time
 import json
+import re
 import asyncio
 from typing import (
     Any,
@@ -20,6 +21,7 @@ from typing import (
     TypedDict,
     Literal,
     Tuple,
+    Set,
 )
 
 import anthropic
@@ -80,34 +82,54 @@ AnthropicMessage = Dict[str, Union[str, List[AnthropicContentItem]]]
 class AnthropicProvider(LLMProvider):
     """Provider implementation for Anthropic Claude models."""
 
-    # Model capability mappings
+    # Model capability mappings with broader pattern matching
     VISION_MODELS = {
+        # Claude 3 family
         "claude-3-opus",
         "claude-3-sonnet",
         "claude-3-haiku",
         "claude-3.5-sonnet",
         "claude-3.7-sonnet",
+        # Future model pattern matching
+        "claude-3",
+        "claude-4",
     }
+
     TOOL_MODELS = {
+        # Claude 3 family with tools support
         "claude-3-opus",
         "claude-3-sonnet",
         "claude-3-haiku",
         "claude-3.5-sonnet",
         "claude-3.7-sonnet",
+        # Future model pattern matching
+        "claude-3",
+        "claude-4",
     }
 
     # Maximum token contexts for different models
     MODEL_CONTEXT_SIZES = {
+        # Claude 2 family
         "claude-2": 100000,
         "claude-2.0": 100000,
         "claude-2.1": 200000,
+        # Claude 3 family
         "claude-3-opus": 200000,
         "claude-3-sonnet": 200000,
         "claude-3-haiku": 200000,
         "claude-3.5-sonnet": 200000,
         "claude-3.7-sonnet": 200000,
+        # Future models (estimates)
+        "claude-4": 400000,
     }
     DEFAULT_CONTEXT_SIZE = 100000
+
+    # Model families for capability detection
+    MODEL_FAMILIES = {
+        "claude-2": {"vision": False, "tools": False},
+        "claude-3": {"vision": True, "tools": True},
+        "claude-4": {"vision": True, "tools": True},
+    }
 
     def __init__(
         self,
@@ -117,6 +139,7 @@ class AnthropicProvider(LLMProvider):
         request_timeout: float = 60.0,
         temperature: float = 0.7,
         max_tokens: Optional[int] = None,
+        validate_model: bool = True,
         **kwargs: Any,
     ) -> None:
         """Initialize the Anthropic provider.
@@ -128,6 +151,7 @@ class AnthropicProvider(LLMProvider):
             request_timeout: Request timeout in seconds
             temperature: Model temperature
             max_tokens: Maximum tokens to generate
+            validate_model: Whether to validate the model with the API
             **kwargs: Additional parameters to pass to Anthropic API
         """
         self.model_name = model_name
@@ -135,13 +159,14 @@ class AnthropicProvider(LLMProvider):
         self.temperature = temperature
         self.max_tokens = max_tokens or 4096  # Default to 4096 if not specified
         self.kwargs = kwargs
+        self._model_capabilities: Optional[Dict[str, bool]] = None
+        self._model_validated: bool = False
 
         # Set base URL
         base_url = api_base if api_base else "https://api.anthropic.com"
 
         # Initialize clients
         self.client = Anthropic(api_key=api_key, base_url=base_url, timeout=request_timeout)
-
         self.async_client = AsyncAnthropic(
             api_key=api_key, base_url=base_url, timeout=request_timeout
         )
@@ -154,6 +179,10 @@ class AnthropicProvider(LLMProvider):
             **kwargs,
         }
 
+        # Validate model if requested
+        if validate_model:
+            self._validate_model()
+
     def get_model_name(self) -> str:
         """Get the model name.
 
@@ -161,6 +190,112 @@ class AnthropicProvider(LLMProvider):
             Model name
         """
         return self.model_name
+
+    def _validate_model(self) -> bool:
+        """Validate if the model exists and is available.
+
+        Returns:
+            True if model is valid, False otherwise
+        """
+        if self._model_validated:
+            return True
+
+        try:
+            # Try to use the model for a simple query to validate
+            # Use explicit parameters instead of a dictionary to satisfy type checker
+            self.client.messages.create(
+                model=self.model_name, max_tokens=1, messages=[{"role": "user", "content": "Test"}]
+            )
+
+            # If we get here, the model exists
+            self._model_validated = True
+            return True
+
+        except anthropic.BadRequestError as e:
+            # Check if the error is due to invalid model
+            if "model" in str(e).lower() and "not found" in str(e).lower():
+                logger.warning(f"Model validation failed: {self.model_name} not found")
+                return False
+            else:
+                # Other bad request errors might be due to parameters, not the model itself
+                self._model_validated = True
+                return True
+
+        except anthropic.AuthenticationError:
+            # Authentication errors don't tell us about model validity
+            logger.warning("Model validation skipped due to authentication error")
+            return True
+
+        except Exception as e:
+            logger.warning(f"Model validation error: {e}")
+            return True  # Assume model is valid if we can't definitively prove otherwise
+
+    def _get_model_family(self) -> str:
+        """Extract the model family from the model name.
+
+        Returns:
+            Model family (e.g., "claude-3" from "claude-3-sonnet")
+        """
+        # Try to match family patterns like claude-2, claude-3, claude-4, etc.
+        match = re.match(r"(claude-\d+(?:\.\d+)?)", self.model_name)
+        if match:
+            return match.group(1)
+
+        # Try to match for major version only
+        match = re.match(r"(claude-\d+)", self.model_name)
+        if match:
+            return match.group(1)
+
+        # Default to first two parts of model name
+        parts = self.model_name.split("-")
+        if len(parts) >= 2:
+            return f"{parts[0]}-{parts[1]}"
+
+        return self.model_name
+
+    def _detect_capabilities(self) -> Dict[str, bool]:
+        """Detect model capabilities based on model name.
+
+        Returns:
+            Dictionary of capabilities
+        """
+        if self._model_capabilities is not None:
+            return self._model_capabilities
+
+        capabilities = {"vision": False, "tools": False}
+
+        # First, check if the model name exactly matches known models
+        for vision_model in self.VISION_MODELS:
+            if vision_model in self.model_name:
+                capabilities["vision"] = True
+                break
+
+        for tool_model in self.TOOL_MODELS:
+            if tool_model in self.model_name:
+                capabilities["tools"] = True
+                break
+
+        # If capabilities aren't fully determined, check model family
+        if not (capabilities["vision"] and capabilities["tools"]):
+            model_family = self._get_model_family()
+
+            # Check against known model families
+            for family, family_capabilities in self.MODEL_FAMILIES.items():
+                if family in model_family:
+                    # Update only unset capabilities
+                    if not capabilities["vision"]:
+                        capabilities["vision"] = family_capabilities["vision"]
+                    if not capabilities["tools"]:
+                        capabilities["tools"] = family_capabilities["tools"]
+                    break
+
+        # Claude 3 and newer models generally support both vision and tools
+        if re.search(r"claude-[3-9]", self.model_name):
+            capabilities["vision"] = True
+            capabilities["tools"] = True
+
+        self._model_capabilities = capabilities
+        return capabilities
 
     def _prepare_messages(
         self, messages: List[Message]
@@ -230,10 +365,15 @@ class AnthropicProvider(LLMProvider):
 
             # Handle tool calls for assistant messages
             if message.tool_calls and role == "assistant":
+                # Check if the model supports tools
+                if not self.supports_tools():
+                    raise ModelCapabilityError(self.model_name, "tools")
+
                 # Convert to Anthropic tool calls format
                 tool_uses: List[AnthropicToolUse] = []
                 for tool_call in message.tool_calls:
                     try:
+                        # Try to parse arguments as JSON
                         function_args = json.loads(tool_call.function.arguments)
                     except json.JSONDecodeError:
                         # If arguments are not valid JSON, try to parse as string
@@ -395,6 +535,11 @@ class AnthropicProvider(LLMProvider):
                     self.model_name, self.count_tokens(messages), self.get_max_tokens()
                 )
 
+            # Check for model not found errors
+            if "model" in str(e).lower() and "not found" in str(e).lower():
+                logger.error(f"Model not found: {self.model_name}")
+                raise ModelNotAvailable(self.model_name, f"Model not found: {e}")
+
             logger.error(f"Bad request: {e}")
             raise ParameterError(f"Invalid request: {e}")
 
@@ -497,6 +642,11 @@ class AnthropicProvider(LLMProvider):
                     self.model_name, self.count_tokens(messages), self.get_max_tokens()
                 )
 
+            # Check for model not found errors
+            if "model" in str(e).lower() and "not found" in str(e).lower():
+                logger.error(f"Model not found: {self.model_name}")
+                raise ModelNotAvailable(self.model_name, f"Model not found: {e}")
+
             logger.error(f"Bad request: {e}")
             raise ParameterError(f"Invalid request: {e}")
 
@@ -559,6 +709,11 @@ class AnthropicProvider(LLMProvider):
                 raise ContextWindowExceededError(
                     self.model_name, self.count_tokens(messages), self.get_max_tokens()
                 )
+
+            # Check for model not found errors
+            if "model" in str(e).lower() and "not found" in str(e).lower():
+                logger.error(f"Model not found: {self.model_name}")
+                raise ModelNotAvailable(self.model_name, f"Model not found: {e}")
 
             logger.error(f"Bad request: {e}")
             raise ParameterError(f"Invalid request: {e}")
@@ -665,6 +820,11 @@ class AnthropicProvider(LLMProvider):
                         self.model_name, self.count_tokens(messages), self.get_max_tokens()
                     )
 
+                # Check for model not found errors
+                if "model" in str(e).lower() and "not found" in str(e).lower():
+                    logger.error(f"Model not found: {self.model_name}")
+                    raise ModelNotAvailable(self.model_name, f"Model not found: {e}")
+
                 logger.error(f"Bad request: {e}")
                 raise ParameterError(f"Invalid request: {e}")
 
@@ -698,10 +858,28 @@ class AnthropicProvider(LLMProvider):
         Returns:
             Maximum token count
         """
-        # Try to get exact model context size, otherwise use default
+        # Try to get exact model context size
         for model_prefix, context_size in self.MODEL_CONTEXT_SIZES.items():
             if self.model_name.startswith(model_prefix):
                 return context_size
+
+        # Try pattern matching for model families
+        model_family = self._get_model_family()
+        for family_prefix, context_size in self.MODEL_CONTEXT_SIZES.items():
+            if family_prefix in model_family:
+                return context_size
+
+        # Extract from model name if possible
+        # Look for patterns like "100k", "200k" in model name
+        context_match = re.search(r"(\d+)[kK](?:ctx)?", self.model_name)
+        if context_match:
+            return int(context_match.group(1)) * 1000
+
+        # Use a safe default based on model family
+        if "claude-3" in self.model_name.lower():
+            return 200000  # Default for Claude 3 models
+        elif "claude-4" in self.model_name.lower():
+            return 400000  # Default for future Claude 4 models
 
         # Use a safe default
         logger.warning(f"Unknown context size for model {self.model_name}. Using default.")
@@ -713,7 +891,8 @@ class AnthropicProvider(LLMProvider):
         Returns:
             True if vision is supported, False otherwise
         """
-        return any(model in self.model_name for model in self.VISION_MODELS)
+        capabilities = self._detect_capabilities()
+        return capabilities["vision"]
 
     def supports_tools(self) -> bool:
         """Check if the provider/model supports tool/function calling.
@@ -721,4 +900,5 @@ class AnthropicProvider(LLMProvider):
         Returns:
             True if tool calling is supported, False otherwise
         """
-        return any(model in self.model_name for model in self.TOOL_MODELS)
+        capabilities = self._detect_capabilities()
+        return capabilities["tools"]
