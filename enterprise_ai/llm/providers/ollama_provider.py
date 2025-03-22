@@ -613,10 +613,34 @@ class OllamaProvider(LLMProvider):
             request_data["prompt"] = prompt
             endpoint = "/api/generate"
 
+        # Explicitly set stream to false for regular requests
+        request_data["stream"] = False
+
         # Make the request
         response = self.client.post(endpoint, json=request_data)
         response.raise_for_status()
-        return cast(Dict[str, Any], response.json())
+        
+        # Handle the response more robustly
+        try:
+            # First try standard JSON parsing
+            return cast(Dict[str, Any], response.json())
+        except json.JSONDecodeError:
+            # If that fails, try parsing the first line only
+            response_text = response.text.strip()
+            logger.debug("Received non-standard JSON response, attempting line-by-line parsing")
+            
+            # Find the first complete JSON object
+            try:
+                first_json_end = response_text.find('\n')
+                if first_json_end > 0:
+                    first_line = response_text[:first_json_end]
+                    return cast(Dict[str, Any], json.loads(first_line))
+                else:
+                    # If no newline, try parsing the whole text again
+                    return cast(Dict[str, Any], json.loads(response_text))
+            except json.JSONDecodeError as e:
+                logger.error(f"Failed to parse Ollama response: {response_text[:200]}...")
+                raise APIError(500, f"Failed to parse Ollama response: {e}")
 
     @retry_with_exponential_backoff()
     def complete(self, messages: List[Message], **kwargs: Any) -> Message:
