@@ -7,7 +7,18 @@ including the provider interface, token management, and conversation utilities.
 
 import asyncio
 from abc import ABC, abstractmethod
-from typing import Any, Dict, Generator, List, Optional, AsyncGenerator, TypeVar, cast
+from typing import (
+    Any,
+    Coroutine,
+    Dict,
+    Generator,
+    List,
+    Optional,
+    AsyncGenerator,
+    TypeVar,
+    cast,
+    Tuple,
+)
 
 from enterprise_ai.schema import Message, Role
 from enterprise_ai.exceptions import LLMError, TokenLimitExceeded
@@ -86,7 +97,7 @@ class LLMProvider(ABC):
     @abstractmethod
     async def acomplete_stream(
         self, messages: List[Message], **kwargs: Any
-    ) -> AsyncGenerator[Message, None]:
+    ) -> Coroutine[Any, Any, AsyncGenerator[Message, None]]:
         """Generate a streaming completion for the given messages asynchronously.
 
         Args:

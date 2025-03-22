@@ -99,30 +99,23 @@ class LLMService:
         # Get provider-specific configuration
         provider_config = config.llm.get(provider_name, config.llm.get("default"))
 
+        # Create provider configuration with safe access
+        provider_config_dict: Dict[str, Any] = {}
+        if provider_config is not None:
+            provider_config_dict = {
+                "api_key": getattr(provider_config, "api_key", None),
+                "api_base": getattr(provider_config, "base_url", None),
+                "temperature": getattr(provider_config, "temperature", 0.7),
+                "max_tokens": getattr(provider_config, "max_tokens", None),
+            }
+
         # Create provider instance with appropriate configuration
         if provider_name == "openai":
-            return OpenAIProvider(
-                model_name=model_name,
-                api_key=provider_config.api_key,
-                api_base=provider_config.base_url,
-                temperature=provider_config.temperature,
-                max_tokens=provider_config.max_tokens,
-            )
+            return OpenAIProvider(model_name=model_name, **provider_config_dict)
         elif provider_name == "anthropic":
-            return AnthropicProvider(
-                model_name=model_name,
-                api_key=provider_config.api_key,
-                api_base=provider_config.base_url,
-                temperature=provider_config.temperature,
-                max_tokens=provider_config.max_tokens,
-            )
+            return AnthropicProvider(model_name=model_name, **provider_config_dict)
         elif provider_name == "ollama":
-            return OllamaProvider(
-                model_name=model_name,
-                api_base=provider_config.base_url,
-                temperature=provider_config.temperature,
-                max_tokens=provider_config.max_tokens,
-            )
+            return OllamaProvider(model_name=model_name, **provider_config_dict)
         else:
             # This should never happen due to the earlier check
             raise ProviderNotSupportedError(provider_name)
@@ -197,7 +190,7 @@ class LLMService:
         response = self.provider.complete(messages, **kwargs)
 
         # Store in cache
-        cached_data = {"content": response.content, "metadata": response.metadata}
+        cached_data: Dict[str, Any] = {"content": response.content, "metadata": response.metadata}
 
         # Add tool calls if present
         if hasattr(response, "tool_calls") and response.tool_calls:
@@ -288,7 +281,7 @@ class LLMService:
         response = await self.provider.acomplete(messages, **kwargs)
 
         # Store in cache
-        cached_data = {"content": response.content, "metadata": response.metadata}
+        cached_data: Dict[str, Any] = {"content": response.content, "metadata": response.metadata}
 
         # Add tool calls if present
         if hasattr(response, "tool_calls") and response.tool_calls:
@@ -312,18 +305,16 @@ class LLMService:
     async def acomplete_stream(
         self, messages: List[Message], **kwargs: Any
     ) -> AsyncGenerator[Message, None]:
-        """Generate a streaming completion for the given messages asynchronously.
-
-        Args:
-            messages: List of messages in the conversation
-            **kwargs: Additional completion options
-
-        Returns:
-            Async generator yielding partial completion messages
-        """
+        """Generate a streaming completion for the given messages asynchronously."""
         # Streaming always skips cache
         kwargs["stream"] = True
-        async for message in self.provider.acomplete_stream(messages, **kwargs):
+
+        # Use an explicit type cast to help the type checker
+        coroutine_result = self.provider.acomplete_stream(messages, **kwargs)
+        generator = cast(AsyncGenerator[Message, None], await coroutine_result)
+
+        # Now iterate over the properly typed generator
+        async for message in generator:
             yield message
 
     def count_tokens(self, messages: List[Message]) -> int:
@@ -399,7 +390,7 @@ def complete(messages: List[Message], **kwargs: Any) -> Message:
     Returns:
         Generated completion message
     """
-    return default_llm_service.complete(messages, **kwargs)
+    return cast(Message, default_llm_service.complete(messages, **kwargs))
 
 
 def complete_stream(messages: List[Message], **kwargs: Any) -> Generator[Message, None, None]:
@@ -412,7 +403,9 @@ def complete_stream(messages: List[Message], **kwargs: Any) -> Generator[Message
     Returns:
         Generator yielding partial completion messages
     """
-    return default_llm_service.complete_stream(messages, **kwargs)
+    return cast(
+        Generator[Message, None, None], default_llm_service.complete_stream(messages, **kwargs)
+    )
 
 
 async def acomplete(messages: List[Message], **kwargs: Any) -> Message:
@@ -425,7 +418,7 @@ async def acomplete(messages: List[Message], **kwargs: Any) -> Message:
     Returns:
         Generated completion message
     """
-    return await default_llm_service.acomplete(messages, **kwargs)
+    return cast(Message, await default_llm_service.acomplete(messages, **kwargs))
 
 
 async def acomplete_stream(messages: List[Message], **kwargs: Any) -> AsyncGenerator[Message, None]:
@@ -462,27 +455,3 @@ def get_conversation_manager(
 def clear_cache() -> None:
     """Clear the default LLM service cache."""
     default_llm_service.clear_cache()
-
-
-# Export utility functions for ease of use
-__all__ = [
-    # Classes
-    "LLMService",
-    "ConversationManager",
-    "MemoryCache",
-    "DiskCache",
-    "RetryConfig",
-    # Main service functions
-    "complete",
-    "complete_stream",
-    "acomplete",
-    "acomplete_stream",
-    "get_conversation_manager",
-    "clear_cache",
-    # Image utilities
-    "encode_image_file",
-    "encode_image_bytes",
-    "encode_image_from_url",
-    # Services
-    "default_llm_service",
-]

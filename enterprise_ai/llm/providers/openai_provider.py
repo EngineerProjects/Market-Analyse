@@ -7,11 +7,30 @@ This module implements the LLMProvider interface for OpenAI models.
 import time
 import json
 import logging
-from typing import Any, Dict, Generator, List, Optional, AsyncGenerator, Union, cast
+from typing import (
+    Any,
+    Coroutine,
+    Dict,
+    Generator,
+    List,
+    Optional,
+    AsyncGenerator,
+    Union,
+    cast,
+    TypedDict,
+    Literal,
+    Tuple,
+)
 
 import httpx
 import openai
 from openai import OpenAI, AsyncOpenAI
+from openai.types.chat import (
+    ChatCompletion,
+    ChatCompletionMessage,
+    ChatCompletionMessageParam,
+    ChatCompletionChunk,
+)
 
 from enterprise_ai.schema import Message, Role, ToolCall, Function
 from enterprise_ai.exceptions import APIError, ModelNotAvailable
@@ -29,11 +48,44 @@ from enterprise_ai.logger import get_logger, trace_execution
 logger = get_logger("llm.openai")
 
 
+# Define TypedDict classes for OpenAI message content
+class ImageURLDict(TypedDict):
+    url: str
+
+
+class ImageURLContent(TypedDict):
+    type: Literal["image_url"]
+    image_url: ImageURLDict
+
+
+class TextContent(TypedDict):
+    type: Literal["text"]
+    text: str
+
+
+# Type for tool call data in stream processing
+class ToolCallDict(TypedDict):
+    id: str
+    type: str
+    function: Dict[str, str]
+
+
+ContentItem = Union[TextContent, ImageURLContent]
+MessageContent = Union[str, List[ContentItem]]
+
+
 class OpenAIProvider(LLMProvider):
     """Provider implementation for OpenAI models."""
 
     # Model capability mappings
-    VISION_MODELS = {"gpt-4-vision-preview", "gpt-4o", "gpt-4-turbo"}
+    VISION_MODELS = {
+        "gpt-4-vision-preview",
+        "gpt-4o",
+        "gpt-4-turbo",
+        "gpt-4o-mini",
+        "gpt-4o-2024-05-13",
+    }
+
     TOOL_MODELS = {
         "gpt-3.5-turbo-0125",
         "gpt-3.5-turbo-1106",
@@ -42,7 +94,10 @@ class OpenAIProvider(LLMProvider):
         "gpt-4-1106-preview",
         "gpt-4-vision-preview",
         "gpt-4o",
+        "gpt-4o-mini",
         "gpt-4",
+        "gpt-4-turbo",
+        "gpt-4o-2024-05-13",
     }
 
     # Maximum token contexts for different models
@@ -55,6 +110,8 @@ class OpenAIProvider(LLMProvider):
         "gpt-4-turbo": 128000,
         "gpt-4-turbo-preview": 128000,
         "gpt-4o": 128000,
+        "gpt-4o-mini": 128000,
+        "gpt-4o-2024-05-13": 128000,
     }
     DEFAULT_CONTEXT_SIZE = 4096
 
@@ -134,19 +191,19 @@ class OpenAIProvider(LLMProvider):
                     raise ModelCapabilityError(self.model_name, "vision")
 
                 # For vision models, content needs to be a list of objects
-                content_list = []
+                content_list: List[ContentItem] = []
 
                 # Add text content if present
                 if message.content:
-                    content_list.append({"type": "text", "text": message.content})
+                    text_item: TextContent = {"type": "text", "text": message.content}
+                    content_list.append(text_item)
 
                 # Add image content
-                content_list.append(
-                    {
-                        "type": "image_url",
-                        "image_url": {"url": f"data:image/jpeg;base64,{message.base64_image}"},
-                    }
-                )
+                image_url_data: ImageURLDict = {
+                    "url": f"data:image/jpeg;base64,{message.base64_image}"
+                }
+                image_item: ImageURLContent = {"type": "image_url", "image_url": image_url_data}
+                content_list.append(image_item)
 
                 msg_dict["content"] = content_list
 
@@ -207,13 +264,16 @@ class OpenAIProvider(LLMProvider):
 
                 tool_calls.append(ToolCall(id=tool_call.id, type=tool_call.type, function=function))
 
-            message = Message.from_tool_calls(tool_calls, content)
+            message = Message.from_tool_calls(tool_calls, content or "")
         else:
             # Standard message
             message = Message.assistant_message(content)
 
         # Optionally include full response metadata
         if full_response:
+            if message.metadata is None:
+                message.metadata = {}
+
             message.metadata["completion"] = {
                 "id": completion.id,
                 "model": completion.model,
@@ -254,8 +314,10 @@ class OpenAIProvider(LLMProvider):
             # Prepare messages
             openai_messages = self._prepare_messages(messages)
 
-            # Call the API
-            response = self.client.chat.completions.create(messages=openai_messages, **params)
+            # Call the API using type cast for compatibility
+            response = self.client.chat.completions.create(
+                messages=cast(List[ChatCompletionMessageParam], openai_messages), **params
+            )
 
             # Convert to Message object
             return self._convert_completion_to_message(response, full_response=True)
@@ -317,16 +379,17 @@ class OpenAIProvider(LLMProvider):
 
             # Stream configuration
             current_content = ""
-            current_tool_calls = []
-            started_tool_call = False
-            current_tool_call = None
+            current_tool_calls: List[ToolCallDict] = []
 
             # Call the API
             response_stream = self.client.chat.completions.create(
-                messages=openai_messages, **params
+                messages=cast(List[ChatCompletionMessageParam], openai_messages), **params
             )
 
             for chunk in response_stream:
+                if not hasattr(chunk, "choices") or not chunk.choices:
+                    continue
+
                 # Extract delta
                 delta = chunk.choices[0].delta
 
@@ -338,6 +401,9 @@ class OpenAIProvider(LLMProvider):
                 # Handle tool calls
                 if hasattr(delta, "tool_calls") and delta.tool_calls:
                     for tool_call_delta in delta.tool_calls:
+                        if not hasattr(tool_call_delta, "index"):
+                            continue
+
                         tool_call_index = tool_call_delta.index
 
                         # Extend current_tool_calls list if needed
@@ -456,7 +522,7 @@ class OpenAIProvider(LLMProvider):
 
             # Call the API
             response = await self.async_client.chat.completions.create(
-                messages=openai_messages, **params
+                messages=cast(List[ChatCompletionMessageParam], openai_messages), **params
             )
 
             # Convert to Message object
@@ -493,87 +559,118 @@ class OpenAIProvider(LLMProvider):
     @retry_with_exponential_backoff()
     async def acomplete_stream(
         self, messages: List[Message], **kwargs: Any
-    ) -> AsyncGenerator[Message, None]:
+    ) -> Coroutine[Any, Any, AsyncGenerator[Message, None]]:
         """Generate a streaming completion for the given messages asynchronously.
 
         Args:
             messages: List of messages in the conversation
             **kwargs: Additional completion options
 
-        Yields:
-            Partial completion messages
+        Returns:
+            Async generator yielding partial completion messages
 
         Raises:
             APIError: If there's an API error
             ModelNotAvailable: If the model is not available
             TokenLimitExceeded: If the token limit is exceeded
         """
-        try:
-            # Get API parameters
-            params = self.default_params.copy()
-            params.update(kwargs)
-            params["stream"] = True
+        # Get API parameters
+        params = self.default_params.copy()
+        params.update(kwargs)
+        params["stream"] = True
 
-            # Prepare messages
-            openai_messages = self._prepare_messages(messages)
+        # Prepare messages
+        openai_messages = self._prepare_messages(messages)
 
-            # Stream configuration
-            current_content = ""
-            current_tool_calls = []
+        # Create a properly typed async generator function
+        async def stream_generator() -> AsyncGenerator[Message, None]:
+            try:
+                # Stream configuration
+                current_content = ""
+                current_tool_calls: List[ToolCallDict] = []
 
-            # Call the API
-            response_stream = await self.async_client.chat.completions.create(
-                messages=openai_messages, **params
-            )
+                # Call the API - properly await the response
+                response_stream = await self.async_client.chat.completions.create(
+                    messages=cast(List[ChatCompletionMessageParam], openai_messages), **params
+                )
 
-            async for chunk in response_stream:
-                # Extract delta
-                delta = chunk.choices[0].delta
+                # Ensure we get a proper stream response
+                if not hasattr(response_stream, "__aiter__"):
+                    raise APIError(500, "Expected streaming response but got non-iterable")
 
-                # Update message content
-                if hasattr(delta, "content") and delta.content is not None:
-                    current_content += delta.content
-                    yield Message.assistant_message(current_content)
+                # Process the stream
+                async for chunk in response_stream:
+                    if not hasattr(chunk, "choices") or not chunk.choices:
+                        continue
 
-                # Handle tool calls
-                if hasattr(delta, "tool_calls") and delta.tool_calls:
-                    for tool_call_delta in delta.tool_calls:
-                        tool_call_index = tool_call_delta.index
+                    # Extract delta
+                    delta = chunk.choices[0].delta
 
-                        # Extend current_tool_calls list if needed
-                        while len(current_tool_calls) <= tool_call_index:
-                            current_tool_calls.append(
-                                {
-                                    "id": "",
-                                    "type": "function",
-                                    "function": {"name": "", "arguments": ""},
-                                }
-                            )
+                    # Update message content
+                    if hasattr(delta, "content") and delta.content is not None:
+                        current_content += delta.content
+                        yield Message.assistant_message(current_content)
 
-                        # Update tool call
-                        if hasattr(tool_call_delta, "id") and tool_call_delta.id:
-                            current_tool_calls[tool_call_index]["id"] = tool_call_delta.id
+                    # Handle tool calls
+                    if hasattr(delta, "tool_calls") and delta.tool_calls:
+                        for tool_call_delta in delta.tool_calls:
+                            if not hasattr(tool_call_delta, "index"):
+                                continue
 
-                        if hasattr(tool_call_delta, "function"):
-                            func_delta = tool_call_delta.function
+                            tool_call_index = tool_call_delta.index
 
-                            if hasattr(func_delta, "name") and func_delta.name:
-                                current_tool_calls[tool_call_index]["function"]["name"] = (
-                                    func_delta.name
+                            # Extend current_tool_calls list if needed
+                            while len(current_tool_calls) <= tool_call_index:
+                                current_tool_calls.append(
+                                    {
+                                        "id": "",
+                                        "type": "function",
+                                        "function": {"name": "", "arguments": ""},
+                                    }
                                 )
 
-                            if hasattr(func_delta, "arguments") and func_delta.arguments:
-                                current_args = current_tool_calls[tool_call_index]["function"][
-                                    "arguments"
-                                ]
-                                current_tool_calls[tool_call_index]["function"]["arguments"] = (
-                                    current_args + func_delta.arguments
+                            # Update tool call
+                            if hasattr(tool_call_delta, "id") and tool_call_delta.id:
+                                current_tool_calls[tool_call_index]["id"] = tool_call_delta.id
+
+                            if hasattr(tool_call_delta, "function"):
+                                func_delta = tool_call_delta.function
+
+                                if hasattr(func_delta, "name") and func_delta.name:
+                                    current_tool_calls[tool_call_index]["function"]["name"] = (
+                                        func_delta.name
+                                    )
+
+                                if hasattr(func_delta, "arguments") and func_delta.arguments:
+                                    current_args = current_tool_calls[tool_call_index][
+                                        "function"
+                                    ].get("arguments", "")
+                                    current_tool_calls[tool_call_index]["function"]["arguments"] = (
+                                        current_args + func_delta.arguments
+                                    )
+
+                        # Convert to Message objects
+                        tool_calls = []
+                        for tc in current_tool_calls:
+                            if tc.get("id") and tc.get("function", {}).get("name"):
+                                function = Function(
+                                    name=tc["function"]["name"],
+                                    arguments=tc["function"]["arguments"],
                                 )
 
-                    # Convert to Message objects
+                                tool_calls.append(
+                                    ToolCall(id=tc["id"], type=tc["type"], function=function)
+                                )
+
+                        if tool_calls:
+                            yield Message.from_tool_calls(tool_calls, current_content)
+
+                # Return final message
+                if current_tool_calls and any(tc.get("id") for tc in current_tool_calls):
+                    # Final tool call message
                     tool_calls = []
                     for tc in current_tool_calls:
-                        if tc["id"] and tc["function"]["name"]:
+                        if tc.get("id"):
                             function = Function(
                                 name=tc["function"]["name"], arguments=tc["function"]["arguments"]
                             )
@@ -582,53 +679,43 @@ class OpenAIProvider(LLMProvider):
                                 ToolCall(id=tc["id"], type=tc["type"], function=function)
                             )
 
-                    if tool_calls:
-                        yield Message.from_tool_calls(tool_calls, current_content)
+                    yield Message.from_tool_calls(tool_calls, current_content)
+                else:
+                    # Final content-only message
+                    yield Message.assistant_message(current_content)
 
-            # Return final message
-            if current_tool_calls and any(tc["id"] for tc in current_tool_calls):
-                # Final tool call message
-                tool_calls = []
-                for tc in current_tool_calls:
-                    if tc["id"]:
-                        function = Function(
-                            name=tc["function"]["name"], arguments=tc["function"]["arguments"]
-                        )
+            except openai.RateLimitError as e:
+                logger.error(f"Rate limit exceeded: {e}")
+                raise APIError(429, f"OpenAI rate limit exceeded: {e}")
 
-                        tool_calls.append(ToolCall(id=tc["id"], type=tc["type"], function=function))
+            except openai.APIError as e:
+                logger.error(f"OpenAI API error: {e}")
+                status_code = getattr(e, "status_code", 500)
+                raise APIError(status_code, f"OpenAI API error: {e}")
 
-                yield Message.from_tool_calls(tool_calls, current_content)
-            else:
-                # Final content-only message
-                yield Message.assistant_message(current_content)
+            except openai.BadRequestError as e:
+                # Check for token limit errors
+                if "maximum context length" in str(e).lower():
+                    logger.error(f"Token limit exceeded: {e}")
+                    raise ContextWindowExceededError(
+                        self.model_name, self.count_tokens(messages), self.get_max_tokens()
+                    )
 
-        except openai.RateLimitError as e:
-            logger.error(f"Rate limit exceeded: {e}")
-            raise APIError(429, f"OpenAI rate limit exceeded: {e}")
+                logger.error(f"Bad request: {e}")
+                raise ParameterError(f"Invalid request: {e}")
 
-        except openai.APIError as e:
-            logger.error(f"OpenAI API error: {e}")
-            status_code = getattr(e, "status_code", 500)
-            raise APIError(status_code, f"OpenAI API error: {e}")
+            except openai.AuthenticationError as e:
+                logger.error(f"Authentication error: {e}")
+                raise APIError(401, f"OpenAI authentication error: {e}")
 
-        except openai.BadRequestError as e:
-            # Check for token limit errors
-            if "maximum context length" in str(e).lower():
-                logger.error(f"Token limit exceeded: {e}")
-                raise ContextWindowExceededError(
-                    self.model_name, self.count_tokens(messages), self.get_max_tokens()
-                )
+            except Exception as e:
+                logger.error(f"Unexpected error: {e}")
+                raise APIError(500, f"Unexpected error: {e}")
 
-            logger.error(f"Bad request: {e}")
-            raise ParameterError(f"Invalid request: {e}")
+        async def get_generator() -> AsyncGenerator[Message, None]:
+            return stream_generator()
 
-        except openai.AuthenticationError as e:
-            logger.error(f"Authentication error: {e}")
-            raise APIError(401, f"OpenAI authentication error: {e}")
-
-        except Exception as e:
-            logger.error(f"Unexpected error: {e}")
-            raise APIError(500, f"Unexpected error: {e}")
+        return get_generator()
 
     def count_tokens(self, messages: List[Message]) -> int:
         """Count the number of tokens in the given messages.

@@ -7,7 +7,16 @@ This module implements the LLMProvider interface for local Ollama models.
 import json
 import time
 import asyncio
-from typing import Any, Dict, Generator, List, Optional, AsyncGenerator, Union, cast
+from typing import (
+    Any,
+    Coroutine,
+    Dict,
+    Generator,
+    List,
+    Optional,
+    AsyncGenerator,
+    Union,
+)
 
 import httpx
 
@@ -30,14 +39,25 @@ logger = get_logger("llm.ollama")
 class OllamaProvider(LLMProvider):
     """Provider implementation for Ollama models."""
 
-    # Model capability mappings
-    VISION_MODELS = {"llava", "bakllava", "moondream"}
-    TOOL_MODELS = {"llama3", "mistral", "mixtral"}  # Depends on specific versions and fine-tunes
+    # Model capability mappings - Enhanced vision model support
+    VISION_MODELS = {
+        "llava",
+        "bakllava",
+        "moondream",
+        "llama3-vision",
+        "llama3.1-vision",
+        "llama3.2-vision",
+        "cogvlm",
+    }
+
+    TOOL_MODELS = {"llama3", "mistral", "mixtral", "openhermes", "wizardlm", "deepseek-coder"}
 
     # Maximum token contexts for different model families
     MODEL_CONTEXT_SIZES = {
         "llama2": 4096,
         "llama3": 8192,
+        "llama3.1": 16384,
+        "llama3.2": 32768,
         "mistral": 8192,
         "mixtral": 32768,
         "phi": 2048,
@@ -90,19 +110,15 @@ class OllamaProvider(LLMProvider):
         """
         return self.model_name
 
-    def _prepare_messages(self, messages: List[Message]) -> str:
+    def _prepare_messages(self, messages: List[Message]) -> Union[str, Dict[str, Any]]:
         """Convert our Message objects to Ollama API format.
 
         Args:
             messages: List of Message objects
 
         Returns:
-            Formatted string for Ollama prompt
+            Formatted string for Ollama prompt or chat messages dict
         """
-        # Ollama (at least versions prior to 0.1.24) uses a simple string prompt
-        # but newer versions support a chat format
-        # We'll implement both and check which one to use
-
         # First try to get model info to check if it supports chat format
         try:
             response = self.client.get("/api/show", params={"name": self.model_name})
@@ -149,7 +165,7 @@ class OllamaProvider(LLMProvider):
                 logger.warning(f"Skipping message with unsupported role: {message.role}")
                 continue
 
-            msg_dict = {"role": role}
+            msg_dict: Dict[str, str] = {"role": role}
 
             # Handle content
             if message.content is not None:
@@ -162,9 +178,20 @@ class OllamaProvider(LLMProvider):
                 if not self.supports_vision():
                     raise ModelCapabilityError(self.model_name, "vision")
 
-                # Ollama doesn't have standard image format in chat,
-                # append image Markdown to content as workaround
-                msg_dict["content"] += f"\n![image](data:image/jpeg;base64,{message.base64_image})"
+                # Different models might require different image formats
+                if any(
+                    vision_model in self.model_name.lower()
+                    for vision_model in ["llama3", "llama-3"]
+                ):
+                    # Format for llama3-vision models
+                    msg_dict["content"] += (
+                        f"\n<image>\ndata:image/jpeg;base64,{message.base64_image}\n</image>"
+                    )
+                else:
+                    # Format for llava and other models
+                    msg_dict["content"] += (
+                        f"\n![image](data:image/jpeg;base64,{message.base64_image})"
+                    )
 
             # Add tool calls as formatted text (workaround)
             if message.tool_calls and role == "assistant":
@@ -221,8 +248,16 @@ class OllamaProvider(LLMProvider):
                 if not self.supports_vision():
                     raise ModelCapabilityError(self.model_name, "vision")
 
-                # Simple format for adding image to prompt
-                content += f"\n![image](data:image/jpeg;base64,{message.base64_image})"
+                # Different models might require different image formats
+                if any(
+                    vision_model in self.model_name.lower()
+                    for vision_model in ["llama3", "llama-3"]
+                ):
+                    # Format for llama3-vision models
+                    content += f"\n<image>\ndata:image/jpeg;base64,{message.base64_image}\n</image>"
+                else:
+                    # Format for llava and other models
+                    content += f"\n![image](data:image/jpeg;base64,{message.base64_image})"
 
             # Add tool calls as formatted text
             if message.tool_calls and message.role == Role.ASSISTANT:
@@ -253,7 +288,7 @@ class OllamaProvider(LLMProvider):
 
         # Check for tool calls in content (simple regex pattern matching)
         # This is a basic workaround since Ollama doesn't natively support tool calls
-        tool_calls = []
+        tool_calls: List[ToolCall] = []
 
         if "[Function Call]" in content:
             # Very simple parsing, would need to be more robust in production
@@ -284,6 +319,9 @@ class OllamaProvider(LLMProvider):
 
         # Optionally include full response metadata
         if full_response:
+            if message.metadata is None:
+                message.metadata = {}
+
             message.metadata["completion"] = {
                 "model": completion.get("model", self.model_name),
                 "created_at": completion.get("created_at", ""),
@@ -437,7 +475,7 @@ class OllamaProvider(LLMProvider):
 
                 # Stream configuration
                 current_content = ""
-                current_raw_chunks = []
+                current_raw_chunks: List[Dict[str, Any]] = []
 
                 # Process the stream
                 for line in response.iter_lines():
@@ -602,120 +640,132 @@ class OllamaProvider(LLMProvider):
     @retry_with_exponential_backoff()
     async def acomplete_stream(
         self, messages: List[Message], **kwargs: Any
-    ) -> AsyncGenerator[Message, None]:
+    ) -> Coroutine[Any, Any, AsyncGenerator[Message, None]]:
         """Generate a streaming completion for the given messages asynchronously.
 
         Args:
             messages: List of messages in the conversation
             **kwargs: Additional completion options
 
-        Yields:
-            Partial completion messages
+        Returns:
+            Async generator yielding partial completion messages
 
         Raises:
             APIError: If there's an API error
             ModelNotAvailable: If the model is not available
             TokenLimitExceeded: If the token limit is exceeded
         """
-        try:
-            # Get API parameters
-            params = self.default_params.copy()
-            params.update(kwargs)
-            params["stream"] = True
+        # Get API parameters
+        params = self.default_params.copy()
+        params.update(kwargs)
+        params["stream"] = True
 
-            # Check if we should use chat or completion endpoint
-            endpoint = (
-                "/api/chat"
-                if isinstance(self._prepare_messages(messages), dict)
-                else "/api/generate"
-            )
+        # Check if we should use chat or completion endpoint
+        endpoint = (
+            "/api/chat" if isinstance(self._prepare_messages(messages), dict) else "/api/generate"
+        )
 
-            # Prepare messages or prompt
-            message_data = self._prepare_messages(messages)
+        # Prepare messages or prompt
+        message_data = self._prepare_messages(messages)
 
-            # Prepare the request data
-            if isinstance(message_data, dict):
-                # Chat format
-                request_data = {**params, **message_data}
-            else:
-                # Legacy prompt format
-                request_data = {**params, "prompt": message_data}
+        # Prepare the request data
+        if isinstance(message_data, dict):
+            # Chat format
+            request_data = {**params, **message_data}
+        else:
+            # Legacy prompt format
+            request_data = {**params, "prompt": message_data}
 
-            # Call the API
-            async with self.async_client.stream("POST", endpoint, json=request_data) as response:
-                response.raise_for_status()
-
-                # Stream configuration
-                current_content = ""
-                current_raw_chunks = []
-
-                # Process the stream
-                async for line in response.aiter_lines():
-                    if not line.strip():
-                        continue
-
-                    try:
-                        chunk = json.loads(line)
-                        current_raw_chunks.append(chunk)
-
-                        if "response" in chunk:
-                            # Add to current content
-                            current_content += chunk["response"]
-                            yield Message.assistant_message(current_content)
-                    except json.JSONDecodeError:
-                        logger.warning(f"Failed to parse chunk: {line}")
-
-                # Extract any tool calls at the end
-                if "[Function Call]" in current_content:
-                    # Use the conversion method to extract tool calls
-                    final_message = self._convert_completion_to_message(
-                        {"response": current_content}, full_response=False
-                    )
-
-                    if hasattr(final_message, "tool_calls") and final_message.tool_calls:
-                        yield final_message
-
-        except httpx.HTTPStatusError as e:
-            status_code = e.response.status_code
-
+        # Create a properly typed async generator function
+        async def stream_generator() -> AsyncGenerator[Message, None]:
             try:
-                error_data = e.response.json()
-                error_message = error_data.get("error", str(e))
-            except Exception:
-                error_message = str(e)
+                # Call the API
+                async with self.async_client.stream(
+                    "POST", endpoint, json=request_data
+                ) as response:
+                    response.raise_for_status()
 
-            if status_code == 404:
-                logger.error(f"Model not found: {self.model_name}")
-                raise ModelNotAvailable(self.model_name, f"Model not found: {error_message}")
+                    # Stream configuration
+                    current_content = ""
+                    current_raw_chunks: List[Dict[str, Any]] = []
 
-            if status_code == 429:
-                logger.error(f"Rate limit exceeded: {error_message}")
-                raise APIError(429, f"Rate limit exceeded: {error_message}")
+                    # Process the stream
+                    async for line in response.aiter_lines():
+                        if not line.strip():
+                            continue
 
-            if 400 <= status_code < 500:
-                # Check for token limit errors in error message
-                if any(
-                    phrase in error_message.lower()
-                    for phrase in ["context length", "token limit", "too long", "too many tokens"]
-                ):
-                    logger.error(f"Token limit exceeded: {error_message}")
-                    raise ContextWindowExceededError(
-                        self.model_name, self.count_tokens(messages), self.get_max_tokens()
-                    )
+                        try:
+                            chunk = json.loads(line)
+                            current_raw_chunks.append(chunk)
 
-                logger.error(f"Bad request: {error_message}")
-                raise ParameterError(f"Invalid request: {error_message}")
+                            if "response" in chunk:
+                                # Add to current content
+                                current_content += chunk["response"]
+                                yield Message.assistant_message(current_content)
+                        except json.JSONDecodeError:
+                            logger.warning(f"Failed to parse chunk: {line}")
 
-            logger.error(f"Ollama API error: {error_message}")
-            raise APIError(status_code, f"Ollama API error: {error_message}")
+                    # Extract any tool calls at the end
+                    if "[Function Call]" in current_content:
+                        # Use the conversion method to extract tool calls
+                        final_message = self._convert_completion_to_message(
+                            {"response": current_content}, full_response=False
+                        )
 
-        except httpx.RequestError as e:
-            logger.error(f"Request error: {e}")
-            raise APIError(500, f"Request error: {e}")
+                        if hasattr(final_message, "tool_calls") and final_message.tool_calls:
+                            yield final_message
 
-        except Exception as e:
-            logger.error(f"Unexpected error: {e}")
-            raise APIError(500, f"Unexpected error: {e}")
+            except httpx.HTTPStatusError as e:
+                status_code = e.response.status_code
+
+                try:
+                    error_data = e.response.json()
+                    error_message = error_data.get("error", str(e))
+                except Exception:
+                    error_message = str(e)
+
+                if status_code == 404:
+                    logger.error(f"Model not found: {self.model_name}")
+                    raise ModelNotAvailable(self.model_name, f"Model not found: {error_message}")
+
+                if status_code == 429:
+                    logger.error(f"Rate limit exceeded: {error_message}")
+                    raise APIError(429, f"Rate limit exceeded: {error_message}")
+
+                if 400 <= status_code < 500:
+                    # Check for token limit errors in error message
+                    if any(
+                        phrase in error_message.lower()
+                        for phrase in [
+                            "context length",
+                            "token limit",
+                            "too long",
+                            "too many tokens",
+                        ]
+                    ):
+                        logger.error(f"Token limit exceeded: {error_message}")
+                        raise ContextWindowExceededError(
+                            self.model_name, self.count_tokens(messages), self.get_max_tokens()
+                        )
+
+                    logger.error(f"Bad request: {error_message}")
+                    raise ParameterError(f"Invalid request: {error_message}")
+
+                logger.error(f"Ollama API error: {error_message}")
+                raise APIError(status_code, f"Ollama API error: {error_message}")
+
+            except httpx.RequestError as e:
+                logger.error(f"Request error: {e}")
+                raise APIError(500, f"Request error: {e}")
+
+            except Exception as e:
+                logger.error(f"Unexpected error: {e}")
+                raise APIError(500, f"Unexpected error: {e}")
+
+        async def get_generator() -> AsyncGenerator[Message, None]:
+            return stream_generator()
+
+        return get_generator()
 
     def count_tokens(self, messages: List[Message]) -> int:
         """Count the number of tokens in the given messages.
@@ -749,7 +799,15 @@ class OllamaProvider(LLMProvider):
         Returns:
             True if vision is supported, False otherwise
         """
-        return any(model in self.model_name.lower() for model in self.VISION_MODELS)
+        # Check if model name directly matches any vision model names
+        if any(model in self.model_name.lower() for model in self.VISION_MODELS):
+            return True
+
+        # Check for model families that support vision
+        if "vision" in self.model_name.lower():
+            return True
+
+        return False
 
     def supports_tools(self) -> bool:
         """Check if the provider/model supports tool/function calling.
@@ -758,5 +816,5 @@ class OllamaProvider(LLMProvider):
             True if tool calling is supported, False otherwise
         """
         # Ollama models need specific fine-tuning for tool usage
-        # This is a simplistic check based on model family
+        # Check if model name matches any tool-supporting models
         return any(model in self.model_name.lower() for model in self.TOOL_MODELS)

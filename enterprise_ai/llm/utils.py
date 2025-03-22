@@ -8,18 +8,17 @@ and retry mechanisms for LLM API calls.
 import time
 import random
 import base64
-import json
 import asyncio
 from functools import wraps
 from pathlib import Path
-from typing import Any, Callable, Dict, List, Optional, Tuple, Union, TypeVar, cast
+from typing import Any, Callable, Dict, List, Optional, Tuple, Type, Union, TypeVar, cast
 
 # Third-party imports
 import requests
 import httpx
 
 from enterprise_ai.schema import Message, Role
-from enterprise_ai.logger import get_logger, trace_execution
+from enterprise_ai.logger import get_logger
 from enterprise_ai.llm.exceptions import TokenCountError, ImageProcessingError
 
 # Initialize logger
@@ -34,7 +33,7 @@ def retry_with_exponential_backoff(
     initial_delay: float = 1.0,
     max_delay: float = 20.0,
     backoff_factor: float = 2.0,
-    retryable_exceptions: Optional[Tuple[Exception, ...]] = None,
+    retryable_exceptions: Optional[Tuple[Type[Exception], ...]] = None,
 ) -> Callable[[F], F]:
     """Decorator for retrying functions with exponential backoff.
 
@@ -49,18 +48,21 @@ def retry_with_exponential_backoff(
         Decorated function
     """
     if retryable_exceptions is None:
-        retryable_exceptions = (
-            requests.exceptions.RequestException,
-            httpx.HTTPError,
-            ConnectionError,
-            TimeoutError,
+        retryable_exceptions = cast(
+            Tuple[Type[Exception], ...],
+            (
+                requests.exceptions.RequestException,
+                httpx.HTTPError,
+                ConnectionError,
+                TimeoutError,
+            ),
         )
 
     def decorator(func: F) -> F:
         @wraps(func)
         def wrapper(*args: Any, **kwargs: Any) -> Any:
             delay = initial_delay
-            last_exception = None
+            last_exception: Optional[BaseException] = None
 
             for retry in range(max_retries + 1):
                 try:
@@ -84,12 +86,15 @@ def retry_with_exponential_backoff(
                     delay = min(delay * backoff_factor, max_delay)
 
             # This should never be reached, but just in case
-            raise last_exception or RuntimeError("Retry logic failed")
+            if last_exception is not None:
+                raise last_exception
+            raise RuntimeError("Retry logic failed")
 
         @wraps(func)
         async def async_wrapper(*args: Any, **kwargs: Any) -> Any:
+            # Similar changes to the async version
             delay = initial_delay
-            last_exception = None
+            last_exception: Optional[BaseException] = None
 
             for retry in range(max_retries + 1):
                 try:
@@ -113,7 +118,9 @@ def retry_with_exponential_backoff(
                     delay = min(delay * backoff_factor, max_delay)
 
             # This should never be reached, but just in case
-            raise last_exception or RuntimeError("Retry logic failed")
+            if last_exception is not None:
+                raise last_exception
+            raise RuntimeError("Retry logic failed")
 
         # Check if function is async or sync
         if asyncio.iscoroutinefunction(func):

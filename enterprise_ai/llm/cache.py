@@ -178,17 +178,14 @@ class DiskCache(LLMCache):
             self._write_index({})
 
     def _read_index(self) -> Dict[str, Dict[str, Any]]:
-        """Read the cache index.
-
-        Returns:
-            Cache index mapping keys to metadata
-        """
+        """Read the cache index."""
         if not self.index_path.exists():
             return {}
 
         try:
             with open(self.index_path, "r") as f:
-                return json.load(f)
+                result = json.load(f)
+                return cast(Dict[str, Dict[str, Any]], result)
         except Exception as e:
             logger.error(f"Error reading cache index: {e}")
             return {}
@@ -262,14 +259,7 @@ class DiskCache(LLMCache):
         self._write_index(index)
 
     def get(self, key: str) -> Optional[Dict[str, Any]]:
-        """Get an item from the cache.
-
-        Args:
-            key: Cache key
-
-        Returns:
-            Cached value or None if not found or expired
-        """
+        """Get an item from the cache."""
         # Check the index first
         index = self._read_index()
         if key not in index:
@@ -291,7 +281,8 @@ class DiskCache(LLMCache):
 
         try:
             with open(cache_path, "r") as f:
-                return json.load(f)
+                result = json.load(f)
+                return cast(Dict[str, Any], result)
         except Exception as e:
             logger.error(f"Error reading cache file {cache_path}: {e}")
             return None

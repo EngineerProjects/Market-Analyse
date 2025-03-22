@@ -12,6 +12,7 @@ import pytest
 from unittest.mock import patch, MagicMock
 
 # Ensure we import the actual implementation
+import enterprise_ai
 from enterprise_ai.config import (
     Config,
     LLMSettings,
@@ -117,17 +118,43 @@ def test_project_root():
 
 def test_workspace_root_creation():
     """Test that WORKSPACE_ROOT is created if it doesn't exist."""
-    # Temporarily modify WORKSPACE_ROOT for testing
-    with patch("enterprise_ai.config.WORKSPACE_ROOT", new=Path("/tmp/test_workspace")):
-        # Create a config instance which should create the workspace directory
-        with patch("enterprise_ai.config.Config._load_config", return_value={}):
-            test_config = Config()
+    # Create a temporary directory for testing
+    import tempfile
+    import shutil
 
-            # Check that the workspace root was created
-            assert test_config.workspace_root.exists()
+    # Create a parent temp directory
+    temp_dir = Path(tempfile.mkdtemp())
+    test_workspace = temp_dir / "test_workspace"
 
-            # Clean up
-            test_config.workspace_root.rmdir()
+    try:
+        # Ensure the test directory doesn't exist initially
+        if test_workspace.exists():
+            shutil.rmtree(test_workspace)
+
+        # Reset Config singleton to ensure clean test
+        original_instance = Config._instance
+        original_initialized = Config._initialized
+        Config._instance = None
+        Config._initialized = False
+
+        try:
+            # Patch the workspace location at multiple levels to ensure it's properly applied
+            with patch.object(enterprise_ai.config, "WORKSPACE_ROOT", test_workspace):
+                # Create a new Config instance with empty config
+                with patch("enterprise_ai.config.Config._load_config", return_value={}):
+                    # Force directory creation by accessing the property
+                    test_config = Config()
+                    _ = test_config.workspace_root
+
+                    # Check if the workspace directory was created
+                    assert test_workspace.exists()
+        finally:
+            # Restore Config singleton
+            Config._instance = original_instance
+            Config._initialized = original_initialized
+    finally:
+        # Clean up using shutil.rmtree which handles non-empty directories
+        shutil.rmtree(temp_dir)
 
 
 def test_singleton_pattern(reset_config):
