@@ -90,7 +90,7 @@ class OllamaProvider(LLMProvider):
         self,
         model_name: str,
         api_base: str = "http://localhost:11434",
-        request_timeout: float = 60.0,
+        request_timeout: float = 900.0,
         temperature: float = 0.7,
         max_tokens: Optional[int] = None,
         validate_model: bool = False,
@@ -514,31 +514,63 @@ class OllamaProvider(LLMProvider):
         Returns:
             Message object
         """
-        content = completion.get("response", "")
-
-        # Check for tool calls in content
+        # Check both formats - generate endpoint and chat endpoint
+        content = ""
         tool_calls: List[ToolCall] = []
 
-        if "[Function Call]" in content:
-            # Simple parsing for function calls
-            import re
+        # Try generate endpoint format
+        if "response" in completion:
+            content = completion.get("response", "")
 
-            pattern = r"\[Function Call\] ([^(]+)\(({.*?})\)"
-            matches = re.findall(pattern, content)
+            # Check for tool calls in content
+            if "[Function Call]" in content:
+                # Simple parsing for function calls
+                import re
 
-            for name, args in matches:
-                # Clean up the content by removing the function call text
-                content = content.replace(f"[Function Call] {name}({args})", "").strip()
+                pattern = r"\[Function Call\] ([^(]+)\(({.*?})\)"
+                matches = re.findall(pattern, content)
 
-                function = Function(name=name.strip(), arguments=args.strip())
+                for name, args in matches:
+                    # Clean up the content by removing the function call text
+                    content = content.replace(f"[Function Call] {name}({args})", "").strip()
+                    function = Function(name=name.strip(), arguments=args.strip())
 
-                tool_calls.append(
-                    ToolCall(
-                        id=f"tc_{hash(name)}_{int(time.time())}",  # Generate a unique ID
-                        type="function",
-                        function=function,
+                    tool_calls.append(
+                        ToolCall(
+                            id=f"tc_{hash(name)}_{int(time.time())}",  # Generate a unique ID
+                            type="function",
+                            function=function,
+                        )
                     )
-                )
+
+        # Try chat endpoint format
+        elif "message" in completion and isinstance(completion["message"], dict):
+            message_data = completion["message"]
+            content = message_data.get("content", "")
+
+            # Check for tool_calls in the message
+            if "tool_calls" in message_data and message_data["tool_calls"]:
+                for tc in message_data["tool_calls"]:
+                    if isinstance(tc, dict) and "function" in tc:
+                        function_data = tc["function"]
+
+                        # Handle different formats of function arguments
+                        arguments = function_data.get("arguments", "")
+                        if isinstance(arguments, dict):
+                            arguments = json.dumps(arguments)
+
+                        function = Function(name=function_data.get("name", ""), arguments=arguments)
+
+                        tool_calls.append(
+                            ToolCall(
+                                id=tc.get(
+                                    "id",
+                                    f"tc_{hash(function_data.get('name', ''))}_{int(time.time())}",
+                                ),
+                                type="function",
+                                function=function,
+                            )
+                        )
 
         # Create appropriate message type
         if tool_calls:
@@ -551,16 +583,25 @@ class OllamaProvider(LLMProvider):
             if message.metadata is None:
                 message.metadata = {}
 
-            message.metadata["completion"] = {
+            metadata_dict = {
                 "model": completion.get("model", self.model_name),
                 "created_at": completion.get("created_at", ""),
                 "done": completion.get("done", True),
-                "total_duration": completion.get("total_duration", 0),
-                "load_duration": completion.get("load_duration", 0),
-                "prompt_eval_count": completion.get("prompt_eval_count", 0),
-                "eval_count": completion.get("eval_count", 0),
-                "eval_duration": completion.get("eval_duration", 0),
             }
+
+            # Add additional fields if they exist
+            for field in [
+                "total_duration",
+                "load_duration",
+                "prompt_eval_count",
+                "eval_count",
+                "eval_duration",
+                "done_reason",
+            ]:
+                if field in completion:
+                    metadata_dict[field] = completion.get(field, 0)
+
+            message.metadata["completion"] = metadata_dict
 
         return message
 
@@ -619,7 +660,7 @@ class OllamaProvider(LLMProvider):
         # Make the request
         response = self.client.post(endpoint, json=request_data)
         response.raise_for_status()
-        
+
         # Handle the response more robustly
         try:
             # First try standard JSON parsing
@@ -628,10 +669,10 @@ class OllamaProvider(LLMProvider):
             # If that fails, try parsing the first line only
             response_text = response.text.strip()
             logger.debug("Received non-standard JSON response, attempting line-by-line parsing")
-            
+
             # Find the first complete JSON object
             try:
-                first_json_end = response_text.find('\n')
+                first_json_end = response_text.find("\n")
                 if first_json_end > 0:
                     first_line = response_text[:first_json_end]
                     return cast(Dict[str, Any], json.loads(first_line))
