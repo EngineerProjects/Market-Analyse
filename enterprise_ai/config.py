@@ -566,18 +566,26 @@ DEFAULT_CONFIG_TOML = """# Enterprise AI Configuration Example (TOML)
 
 # LLM Configuration
 [llm]
+model = "llama3.2"  # Changed default from gpt-4 to llama3
+base_url = "http://localhost:11434"  # Changed default to Ollama URL
+api_key = ""  # Not needed for Ollama
+max_tokens = 4096
+temperature = 0.7
+api_type = "ollama"  # Changed default from openai to ollama
+api_version = ""
+
+# Example of provider-specific overrides
+[llm.ollama]
+model = "llama3.2"
+auto_pull = true
+temperature = 0.7
+
+[llm.gpt4]
 model = "gpt-4-1106-preview"
 base_url = "https://api.openai.com/v1"
 api_key = ""  # Set via environment variable OPENAI_API_KEY
-max_tokens = 4096
-temperature = 0.7
-api_type = "openai"
-api_version = ""
-
-# Example of model-specific override
-[llm.gpt4]
-model = "gpt-4-1106-preview"
 temperature = 0.5
+api_type = "openai"
 
 [llm.claude]
 model = "claude-3-opus-20240229"
@@ -592,7 +600,7 @@ image = "python:3.12-slim"
 work_dir = "/workspace"
 memory_limit = "512m"
 cpu_limit = 1.0
-timeout = 300
+timeout = 900
 network_enabled = false
 
 # Browser Configuration
@@ -614,6 +622,12 @@ max_retries = 3
 max_team_size = 10
 default_roles = ["manager", "developer", "researcher", "analyst"]
 
+# Ollama-specific Configuration
+[ollama]
+auto_pull = true  # Automatically pull models if not available
+timeout = 900.0  # 15 minutes timeout for model operations
+fallback_model = "llama3"  # Fallback model if requested model is unavailable
+
 # Paths
 # workspace_root = "/custom/path"  # Uncomment to override default
 """
@@ -622,18 +636,26 @@ DEFAULT_CONFIG_YAML = """# Enterprise AI Configuration Example (YAML)
 
 # LLM Configuration
 llm:
-  model: "gpt-4-1106-preview"
-  base_url: "https://api.openai.com/v1"
-  api_key: ""  # Set via environment variable OPENAI_API_KEY
+  model: "llama3.2"  # Changed default from gpt-4 to llama3
+  base_url: "http://localhost:11434"  # Changed default to Ollama URL
+  api_key: ""  # Not needed for Ollama
   max_tokens: 4096
   temperature: 0.7
-  api_type: "openai"
+  api_type: "ollama"  # Changed default from openai to ollama
   api_version: ""
 
-  # Example of model-specific override
+  # Example of provider-specific overrides
+  ollama:
+    model: "llama3.2"
+    auto_pull: true
+    temperature: 0.7
+
   gpt4:
     model: "gpt-4-1106-preview"
+    base_url: "https://api.openai.com/v1"
+    api_key: ""  # Set via environment variable OPENAI_API_KEY
     temperature: 0.5
+    api_type: "openai"
 
   claude:
     model: "claude-3-opus-20240229"
@@ -648,7 +670,7 @@ sandbox:
   work_dir: "/workspace"
   memory_limit: "512m"
   cpu_limit: 1.0
-  timeout: 300
+  timeout: 900
   network_enabled: false
 
 # Browser Configuration
@@ -675,6 +697,12 @@ team:
     - "developer"
     - "researcher"
     - "analyst"
+
+# Ollama-specific Configuration
+ollama:
+  auto_pull: true  # Automatically pull models if not available
+  timeout: 900.0  # 15 minutes timeout for model operations
+  fallback_model: "llama3"  # Fallback model if requested model is unavailable
 
 # Paths
 # workspace_root: "/custom/path"  # Uncomment to override default

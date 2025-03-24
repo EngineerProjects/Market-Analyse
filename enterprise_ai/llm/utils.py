@@ -334,6 +334,86 @@ class TokenCounter:
         # Very rough approximation: 4 chars per token
         return total_chars // 4 + 10  # Add some overhead
 
+    @classmethod
+    def _count_ollama_tokens_optimized(cls, model: str, messages: List[Message]) -> int:
+        """Optimized token counting for Ollama models.
+
+        Args:
+            model: Model name
+            messages: List of messages
+
+        Returns:
+            Estimated token count
+        """
+        # Extract model family for more accurate estimation
+        model_family = model.split(":")[0].lower()
+
+        # Character-to-token ratios for different model families
+        token_ratios = {
+            "llama": 3.5,  # ~3.5 chars per token
+            "llama2": 3.5,
+            "llama3": 3.5,
+            "mistral": 3.6,
+            "mixtral": 3.7,
+            "vicuna": 3.5,
+            "falcon": 3.8,
+            "phi": 3.4,
+            "gemma": 3.6,
+            "gpt2": 4.0,
+            "starcoder": 3.3,
+            "codellama": 3.2,
+            "openchat": 3.7,
+            # Default for unknown models
+            "default": 4.0,
+        }
+
+        # Find the best matching ratio
+        best_ratio = token_ratios["default"]
+        for family, ratio in token_ratios.items():
+            if family in model_family:
+                best_ratio = ratio
+                break
+
+        # Count characters in messages
+        total_chars = 0
+        # Initialize system_overhead as an integer
+        system_overhead = 0
+
+        for message in messages:
+            if message.role == Role.SYSTEM:
+                # System messages have higher overhead
+                if message.content:
+                    # Explicit cast to int for the character count increase
+                    total_chars += int(
+                        len(message.content) * 1.2
+                    )  # 20% extra tokens for system context
+                    system_overhead = 15  # tokens
+
+        # Count content in non-system messages
+        for message in messages:
+            if message.role != Role.SYSTEM:
+                # Add role overhead
+                total_chars += len(message.role.value) * 2
+
+                # Add content
+                if message.content:
+                    total_chars += len(message.content)
+
+                # Add image token estimate
+                if message.base64_image:
+                    # For vision models, estimate 1024 tokens per image
+                    # Explicit cast to int for the token estimate
+                    total_chars += int(1024 * best_ratio)
+
+        # Calculate tokens using the model-specific ratio and ensure it returns an int
+        # Use integer division and addition to avoid float conversion
+        # Calculate token estimate, using integer division to avoid float issues
+        token_estimate_int = int(total_chars // best_ratio)
+        # Do remaining calculations with integers
+        final_token_estimate = token_estimate_int + system_overhead + 10  # Add overhead
+
+        return final_token_estimate
+
 
 # Utility functions for image handling
 def encode_image_file(image_path: Union[str, Path]) -> str:

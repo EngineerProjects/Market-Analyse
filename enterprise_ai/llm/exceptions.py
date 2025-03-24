@@ -98,3 +98,44 @@ class ModelCapabilityError(LLMError):
         self.model = model
         self.capability = capability
         super().__init__(f"Model {model} does not support capability: {capability}")
+
+
+class OllamaError(APIError):
+    """Base class for Ollama-specific errors."""
+
+    def __init__(
+        self, message: str = "Ollama error occurred", status_code: Optional[int] = None
+    ) -> None:
+        """Initialize the exception.
+
+        Args:
+            message: Error message
+            status_code: Optional HTTP status code
+        """
+        super().__init__(status_code, message)
+
+
+class OllamaModelUnavailableError(ModelNotAvailable):
+    """Error when an Ollama model is not available."""
+
+    def __init__(self, model: str, message: Optional[str] = None) -> None:
+        """Initialize the exception.
+
+        Args:
+            model: Name of the model
+            message: Error message
+        """
+        msg = message or f"Ollama model '{model}' not available"
+        super().__init__(model, msg)
+
+
+class OllamaConnectionError(OllamaError):
+    """Error connecting to Ollama server."""
+
+    def __init__(self, message: str = "Failed to connect to Ollama server") -> None:
+        """Initialize the exception.
+
+        Args:
+            message: Error message
+        """
+        super().__init__(message, status_code=503)  # Service Unavailable
