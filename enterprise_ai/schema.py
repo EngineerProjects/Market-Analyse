@@ -13,6 +13,11 @@ from typing import Any, Dict, List, Literal, Optional, Union, TypeVar, cast
 
 from pydantic import BaseModel, Field, model_validator
 
+from enterprise_ai.logger import get_logger
+
+# Initialize logger
+logger = get_logger("schema")
+
 # Type variable for generic typing
 T = TypeVar("T")
 
@@ -165,9 +170,36 @@ class Message(BaseModel):
 
     @classmethod
     def user_message(
-        cls, content: str, base64_image: Optional[str] = None, **kwargs: Any
+        cls,
+        content: str,
+        image: Optional[Any] = None,
+        base64_image: Optional[str] = None,
+        **kwargs: Any,
     ) -> "Message":
-        """Create a user message."""
+        """Create a user message.
+
+        Args:
+            content: Message content
+            image: Optional image (file path, URL, bytes, or base64 string)
+            base64_image: Optional pre-encoded base64 image (deprecated, use image instead)
+            **kwargs: Additional message parameters
+
+        Returns:
+            Message object
+        """
+        # Process image if provided
+        if image is not None:
+            from enterprise_ai.llm.image import ImageHandler
+
+            try:
+                if base64_image is not None:
+                    logger.warning("Both 'image' and 'base64_image' provided, using 'image'")
+                base64_data, _ = ImageHandler.process_image(image)
+                base64_image = base64_data
+            except Exception as e:
+                logger.warning(f"Error processing image: {e}")
+                # Don't raise, just warn and continue without the image
+
         return cls(role=Role.USER, content=content, base64_image=base64_image, **kwargs)
 
     @classmethod
@@ -177,9 +209,36 @@ class Message(BaseModel):
 
     @classmethod
     def assistant_message(
-        cls, content: Optional[str] = None, base64_image: Optional[str] = None, **kwargs: Any
+        cls,
+        content: Optional[str] = None,
+        image: Optional[Any] = None,
+        base64_image: Optional[str] = None,
+        **kwargs: Any,
     ) -> "Message":
-        """Create an assistant message."""
+        """Create an assistant message.
+
+        Args:
+            content: Message content
+            image: Optional image (file path, URL, bytes, or base64 string)
+            base64_image: Optional pre-encoded base64 image (deprecated, use image instead)
+            **kwargs: Additional message parameters
+
+        Returns:
+            Message object
+        """
+        # Process image if provided
+        if image is not None:
+            from enterprise_ai.llm.image import ImageHandler
+
+            try:
+                if base64_image is not None:
+                    logger.warning("Both 'image' and 'base64_image' provided, using 'image'")
+                base64_data, _ = ImageHandler.process_image(image)
+                base64_image = base64_data
+            except Exception as e:
+                logger.warning(f"Error processing image: {e}")
+                # Don't raise, just warn and continue without the image
+
         return cls(role=Role.ASSISTANT, content=content, base64_image=base64_image, **kwargs)
 
     @classmethod
@@ -188,10 +247,24 @@ class Message(BaseModel):
         content: str,
         name: str,
         tool_call_id: str,
+        image: Optional[Any] = None,
         base64_image: Optional[str] = None,
         **kwargs: Any,
     ) -> "Message":
         """Create a tool message."""
+        # Process image if provided
+        if image is not None:
+            from enterprise_ai.llm.image import ImageHandler
+
+            try:
+                if base64_image is not None:
+                    logger.warning("Both 'image' and 'base64_image' provided, using 'image'")
+                base64_data, _ = ImageHandler.process_image(image)
+                base64_image = base64_data
+            except Exception as e:
+                logger.warning(f"Error processing image: {e}")
+                # Don't raise, just warn and continue without the image
+
         return cls(
             role=Role.TOOL,
             content=content,
@@ -203,9 +276,27 @@ class Message(BaseModel):
 
     @classmethod
     def agent_message(
-        cls, content: str, name: str, base64_image: Optional[str] = None, **kwargs: Any
+        cls,
+        content: str,
+        name: str,
+        image: Optional[Any] = None,
+        base64_image: Optional[str] = None,
+        **kwargs: Any,
     ) -> "Message":
         """Create an agent message for inter-agent communication."""
+        # Process image if provided
+        if image is not None:
+            from enterprise_ai.llm.image import ImageHandler
+
+            try:
+                if base64_image is not None:
+                    logger.warning("Both 'image' and 'base64_image' provided, using 'image'")
+                base64_data, _ = ImageHandler.process_image(image)
+                base64_image = base64_data
+            except Exception as e:
+                logger.warning(f"Error processing image: {e}")
+                # Don't raise, just warn and continue without the image
+
         return cls(
             role=Role.AGENT,
             content=content,
@@ -219,10 +310,22 @@ class Message(BaseModel):
         cls,
         tool_calls: List[Any],
         content: Union[str, List[str]] = "",
+        image: Optional[Any] = None,
         base64_image: Optional[str] = None,
         **kwargs: Any,
     ) -> "Message":
-        """Create ToolCallsMessage from raw tool calls."""
+        """Create ToolCallsMessage from raw tool calls.
+
+        Args:
+            tool_calls: List of tool calls
+            content: Message content
+            image: Optional image (file path, URL, bytes, or base64 string)
+            base64_image: Optional pre-encoded base64 image (deprecated, use image instead)
+            **kwargs: Additional message parameters
+
+        Returns:
+            Message object with tool calls
+        """
         formatted_calls = [
             ToolCall(
                 id=call.id,
@@ -238,6 +341,19 @@ class Message(BaseModel):
             final_content = "\n".join(content)
         else:
             final_content = content
+
+        # Process image if provided
+        if image is not None:
+            from enterprise_ai.llm.image import ImageHandler
+
+            try:
+                if base64_image is not None:
+                    logger.warning("Both 'image' and 'base64_image' provided, using 'image'")
+                base64_data, _ = ImageHandler.process_image(image)
+                base64_image = base64_data
+            except Exception as e:
+                logger.warning(f"Error processing image: {e}")
+                # Don't raise, just warn and continue without the image
 
         return cls(
             role=Role.ASSISTANT,

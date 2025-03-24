@@ -75,6 +75,9 @@ from enterprise_ai.llm.exceptions import (
     OllamaConnectionError,
 )
 
+# Image processing utilities
+from enterprise_ai.llm.image import ImageHandler
+
 __all__ = [
     # Base classes
     "LLMProvider",
@@ -135,4 +138,6 @@ __all__ = [
     "OllamaError",
     "OllamaModelUnavailableError",
     "OllamaConnectionError",
+    # Image processing utilities
+    "ImageHandler",
 ]
