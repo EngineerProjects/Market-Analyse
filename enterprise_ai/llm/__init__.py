@@ -26,9 +26,6 @@ from enterprise_ai.llm.retry import (
 # Utility functions for LLM handling
 from enterprise_ai.llm.utils import (
     TokenCounter,
-    encode_image_file,
-    encode_image_bytes,
-    encode_image_from_url,
     retry_with_exponential_backoff,
 )
 
@@ -99,9 +96,6 @@ __all__ = [
     "RetryableException",
     # Utility functions
     "TokenCounter",
-    "encode_image_file",
-    "encode_image_bytes",
-    "encode_image_from_url",
     "retry_with_exponential_backoff",
     # Core service and default instance
     "LLMService",
