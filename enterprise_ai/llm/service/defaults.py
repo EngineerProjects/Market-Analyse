@@ -67,67 +67,16 @@ def get_default_llm_service() -> LLMService:
     """
     global _default_llm_service
     if _default_llm_service is None:
-        # Use workspace path from config
-        workspace_root = default_config.workspace_root
+        # Create default service directly from global config
+        _default_llm_service = LLMService.from_global_config()
 
-        # Create workspace cache directory
-        workspace_cache_dir = workspace_root / "cache" / "llm"
-        workspace_cache_dir.mkdir(parents=True, exist_ok=True)
+        # Configure cache for better defaults
+        _default_llm_service.set_config_value("cache_config.cache_type", "hybrid")
+        _default_llm_service.set_config_value("cache_config.synchronize_writes", False)
 
-        # Create cache configuration
-        cache_config = CacheConfig(
-            use_cache=True,
-            cache_type="hybrid",
-            ttl=86400,  # 24 hours
-            max_size_mb=500,  # 500 MB
-            cache_dir=workspace_cache_dir,
-            promotion_policy="both",
-            synchronize_writes=False,  # Async writes for better performance
-        )
-
-        # Create timeout configuration
-        timeouts = RequestTimeouts(
-            default_timeout=60.0,
-            streaming_timeout=300.0,  # 5 minutes for streaming
-            connect_timeout=30.0,
-            read_timeout=90.0,
-        )
-
-        # Define fallback models by provider
-        model_selection = ModelSelectionStrategy(
-            preferred_model="",  # Will be determined from config
-            fallback_models=None,  # Will use defaults by provider
-            auto_fallback=True,
-            fallback_across_providers=True,
-            provider_preferences=["openai", "anthropic", "ollama"],
-        )
-
-        # Configure orchestrator
-        orchestrator_config = OrchestratorConfig(
-            max_concurrent_requests=20,
-            max_queue_size=100,
-            adaptive_scaling=True,
-            max_retries=3,
-            enable_deduplication=True,
-            enable_circuit_breaker=True,
-        )
-
-        # Create service configuration
-        service_config = LLMServiceConfig(
-            cache_config=cache_config,
-            retry_config=DEFAULT_RETRY_CONFIG,
-            timeouts=timeouts,
-            validate_model=False,  # Don't validate by default for performance
-            model_selection=model_selection,
-            connection_pool_size=20,
-            enable_metrics=True,
-            orchestrator_config=orchestrator_config,
-            enable_provider_pooling=True,
-            provider_pool_size=(2, 5),  # Min 2, max 5 providers
-        )
-
-        # Create default service
-        _default_llm_service = LLMService(service_config)
+        # Enable provider pooling for better performance
+        _default_llm_service.set_config_value("enable_provider_pooling", True)
+        _default_llm_service.set_config_value("provider_pool_size", (2, 5))
 
     return _default_llm_service
 

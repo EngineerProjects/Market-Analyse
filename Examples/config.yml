@@ -1,0 +1,192 @@
+# Enterprise AI Configuration File (YAML)
+
+# LLM Configuration
+llm:
+  # Default model configuration
+  model: "llama3.2"
+  base_url: "http://localhost:11434"
+  api_key: ""  # Not needed for Ollama
+  max_tokens: 4096
+  temperature: 0.7
+  api_type: "ollama"
+  api_version: ""
+  max_input_tokens: 32768  # Maximum input context size
+
+  # Provider-specific model configurations
+  # Ollama models
+  ollama:
+    model: "llama3.2"
+    auto_pull: true
+    temperature: 0.7
+    num_ctx: 32768
+    num_gpu: 1
+    repeat_penalty: 1.1
+    num_thread: 8
+    mirostat: 0
+    seed: 42
+
+  llama3:
+    model: "llama3"
+    temperature: 0.8
+    num_ctx: 8192
+
+  mistral:
+    model: "mistral"
+    temperature: 0.7
+    num_ctx: 8192
+
+  llava:
+    model: "llava"
+    temperature: 0.7
+    num_ctx: 8192
+    vision: true
+
+  # OpenAI models
+  gpt4:
+    model: "gpt-4-1106-preview"
+    base_url: "https://api.openai.com/v1"
+    api_key: ""  # Set via environment variable OPENAI_API_KEY
+    temperature: 0.5
+    api_type: "openai"
+    max_tokens: 4096
+
+  gpt4o:
+    model: "gpt-4o"
+    base_url: "https://api.openai.com/v1"
+    api_key: ""  # Set via environment variable OPENAI_API_KEY
+    temperature: 0.5
+    api_type: "openai"
+    max_tokens: 4096
+
+  # Anthropic models
+  claude:
+    model: "claude-3-opus-20240229"
+    base_url: "https://api.anthropic.com/v1"
+    api_key: ""  # Set via environment variable ANTHROPIC_API_KEY
+    api_type: "anthropic"
+    max_tokens: 4096
+    temperature: 0.7
+
+  claude_sonnet:
+    model: "claude-3.5-sonnet"
+    base_url: "https://api.anthropic.com/v1"
+    api_key: ""  # Set via environment variable ANTHROPIC_API_KEY
+    api_type: "anthropic"
+    max_tokens: 4096
+    temperature: 0.7
+
+# Sandbox Configuration
+sandbox:
+  use_sandbox: true
+  image: "python:3.12-slim"
+  work_dir: "/workspace"
+  memory_limit: "2g"
+  cpu_limit: 2.0
+  timeout: 900  # 15 minutes
+  network_enabled: false
+  additional_packages:
+    - numpy
+    - pandas
+    - scikit-learn
+    - matplotlib
+    - tensorflow
+    - torch
+    - transformers
+  volume_mounts:
+    data: "/data"
+    models: "/models"
+  environment_variables:
+    PYTHONPATH: "/workspace"
+    TZ: "UTC"
+
+# Browser Configuration
+browser:
+  headless: true
+  disable_security: false
+  extra_chromium_args:
+    - "--no-sandbox"
+    - "--disable-dev-shm-usage"
+    - "--disable-gpu"
+  max_content_length: 4000
+  default_timeout: 60
+  proxy:
+    server: ""  # Optional proxy server (e.g., "http://proxy.example.com:8080")
+    username: ""
+    password: ""
+  user_agent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
+  cookies_enabled: true
+  javascript_enabled: true
+
+# Search Configuration
+search:
+  engine: "Google"
+  fallback_engines:
+    - "DuckDuckGo"
+    - "Bing"
+  retry_delay: 60
+  max_retries: 3
+  results_per_page: 10
+  search_timeout: 30
+  safe_search: true
+  region: "us"
+  language: "en"
+
+# Team Configuration
+team:
+  max_team_size: 10
+  default_roles:
+    - "manager"
+    - "developer"
+    - "researcher"
+    - "analyst"
+    - "designer"
+    - "quality_assurance"
+    - "security_expert"
+    - "documentation"
+  role_templates_dir: "./team_templates"
+  default_team_name: "enterprise_team"
+  communication_strategy: "hierarchical"  # Options: hierarchical, mesh, star
+  memory_sharing: true
+  decision_threshold: 0.7
+
+# Ollama-specific Configuration
+ollama:
+  auto_pull: true  # Automatically pull models if not available
+  timeout: 900.0  # 15 minutes timeout for model operations
+  fallback_model: "llama3"  # Fallback model if requested model is unavailable
+  keep_alive: true  # Keep models loaded in memory
+  model_cache_size: 3  # Maximum number of models to keep loaded
+  connection_pool_size: 10  # HTTP connection pool size
+
+# Caching Configuration
+cache:
+  enabled: true
+  ttl: 3600  # Time-to-live in seconds (1 hour)
+  max_entries: 1000  # Maximum number of cache entries in memory
+  disk_cache_enabled: true
+  disk_cache_dir: "./cache"
+  disk_cache_size_mb: 500
+
+# Logging Configuration
+logging:
+  console_level: "INFO"  # DEBUG, INFO, WARNING, ERROR, CRITICAL
+  file_level: "DEBUG"
+  log_dir: "./logs"
+  rotation: "100 MB"
+  retention: "30 days"
+  format: "<green>{time:YYYY-MM-DD HH:mm:ss.SSS}</green> | <level>{level: <8}</level> | <cyan>{name}</cyan>:<cyan>{function}</cyan>:<cyan>{line}</cyan> - <level>{message}</level>"
+
+# Project Paths
+workspace_root: "./workspace"  # Base workspace directory
+data_dir: "./data"  # Directory for persistent data storage
+model_cache_dir: "./models"  # Directory for model cache
+output_dir: "./output"  # Directory for generated outputs
+
+# Workflow Configuration
+workflow:
+  default_timeout: 3600  # Default workflow timeout in seconds
+  max_retries: 3  # Maximum retries for failed steps
+  parallel_execution: true  # Allow parallel execution of independent steps
+  checkpointing: true  # Save workflow state at checkpoints
+  checkpoint_interval: 300  # Seconds between checkpoints
+  error_handling_strategy: "continue"  # Options: stop, continue, retry

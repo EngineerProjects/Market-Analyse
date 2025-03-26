@@ -29,7 +29,8 @@ from typing import (
 
 from loguru import logger as _logger
 
-from enterprise_ai.config import PROJECT_ROOT, config
+# Import constants directly from constants module
+from enterprise_ai.constants import PROJECT_ROOT
 
 
 @runtime_checkable
@@ -447,6 +448,3 @@ if __name__ == "__main__":
         _logger.info("This message has context")
 
     test_context()
-
-    # Test automatic cleanup at exit
-    # At this point, shutdown_logging will be called automatically

@@ -1,0 +1,50 @@
+# LLM Service Configuration
+[llm_service]
+provider_name = "openai"
+model_name = "gpt-4o"
+api_key = ""  # Will be loaded from environment
+connection_pool_size = 20
+enable_metrics = true
+validate_model = false
+enable_provider_pooling = true
+provider_pool_size = [2, 5]
+
+# Cache Configuration
+[cache]
+use_cache = true
+cache_type = "hybrid"
+ttl = 86400  # 24 hours
+max_size_mb = 500
+cache_dir = "./workspace/cache/llm"
+promotion_policy = "both"
+synchronize_writes = false
+retention = "7 days"
+
+# Timeout Configuration
+[timeouts]
+default_timeout = 60.0
+streaming_timeout = 300.0
+connect_timeout = 30.0
+read_timeout = 90.0
+
+# Model Selection Strategy
+[model_selection]
+preferred_model = "gpt-4o"
+fallback_models = ["gpt-4o-mini", "gpt-3.5-turbo"]
+auto_fallback = true
+fallback_across_providers = true
+provider_preferences = ["openai", "anthropic", "ollama"]
+
+# Request Orchestration
+[orchestrator]
+max_concurrent_requests = 20
+max_queue_size = 100
+adaptive_scaling = true
+max_retries = 3
+enable_deduplication = true
+enable_circuit_breaker = true
+
+[orchestrator.rate_limits]
+openai = 100.0
+anthropic = 20.0
+ollama = 10.0

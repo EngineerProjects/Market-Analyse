@@ -25,6 +25,8 @@ from typing import (
     cast,
 )
 
+from enterprise_ai.llm.service.utils import RateLimiter
+
 # Import cache classes at the top level
 
 if TYPE_CHECKING:
@@ -131,20 +133,56 @@ class LLMService:
         )
         logger.info(f"Registered LLM provider: {name}")
 
-    def __init__(self, config: Optional[LLMServiceConfig] = None):
+    def __init__(
+        self,
+        config: Optional[Union[LLMServiceConfig, Dict[str, Any], str, Any]] = None,
+        use_global_config: bool = True,
+    ):
         """Initialize the LLM service.
 
         Args:
-            config: Service configuration (uses defaults if not provided)
+            config: Service configuration, can be:
+                - LLMServiceConfig instance
+                - Dictionary of configuration values
+                - Path to a configuration file (YAML/TOML)
+                - Config instance from enterprise_ai.config
+                - None to use default configuration
+            use_global_config: Whether to use global config for missing values
         """
         # Initialize the provider registry
         self.__class__.initialize_registry()
 
-        # Set configuration
-        self.config = config or LLMServiceConfig()
+        # Process configuration based on type
+        if config is None:
+            # Use global config by default if no config provided
+            from enterprise_ai.config import config as default_global_config
 
-        # Initialize config-related variables
-        self._config_instance = self._load_config_instance()
+            self.config = LLMServiceConfig.from_global_config(default_global_config)
+        elif isinstance(config, str):
+            # Load from file path
+            if config.endswith((".yaml", ".yml", ".toml")):
+                self.config = LLMServiceConfig.from_file(config)
+            else:
+                # Try using global Config to load
+                from enterprise_ai.config import Config
+
+                global_config = Config(config_path=config)
+                self.config = LLMServiceConfig.from_global_config(global_config)
+        elif isinstance(config, dict):
+            self.config = LLMServiceConfig.from_dict(config)
+        elif isinstance(config, LLMServiceConfig):
+            self.config = config
+        else:
+            # Assume it's a Config instance
+            try:
+                self.config = LLMServiceConfig.from_global_config(config)
+            except Exception:
+                # Fall back to default
+                self.config = LLMServiceConfig()
+
+        # Control global config usage for fallbacks
+        self.use_global_config = use_global_config
+        self._config_instance = self._load_config_instance() if use_global_config else None
 
         # Get provider and model from config if not specified
         provider_name, model_name = self._resolve_provider_and_model()
@@ -183,14 +221,183 @@ class LLMService:
             f"Initialized LLM service with provider '{provider_name}' and model '{model_name}'"
         )
 
-    def _load_config_instance(self) -> Config:
+    @classmethod
+    def from_file(cls, file_path: str, use_global_config: bool = True) -> "LLMService":
+        """Create LLM service from a configuration file.
+
+        Args:
+            file_path: Path to configuration file
+            use_global_config: Whether to use global config for missing values
+
+        Returns:
+            LLMService instance
+        """
+        config = LLMServiceConfig.from_file(file_path)
+        return cls(config=config, use_global_config=use_global_config)
+
+    @classmethod
+    def from_dict(cls, config_dict: Dict[str, Any], use_global_config: bool = True) -> "LLMService":
+        """Create LLM service from a configuration dictionary.
+
+        Args:
+            config_dict: Configuration dictionary
+            use_global_config: Whether to use global config for missing values
+
+        Returns:
+            LLMService instance
+        """
+        config = LLMServiceConfig.from_dict(config_dict)
+        return cls(config=config, use_global_config=use_global_config)
+
+    @classmethod
+    def from_global_config(cls, config_path: Optional[str] = None, **kwargs: Any) -> "LLMService":
+        """Create LLM service from the global config system.
+
+        Args:
+            config_path: Path to configuration file (optional)
+            **kwargs: Additional arguments for LLMService
+
+        Returns:
+            LLMService instance
+        """
+
+        # Load config from path or use default
+        global_config = Config(config_path=config_path) if config_path else None
+
+        # Create service config from global config
+        service_config = LLMServiceConfig.from_global_config(global_config)
+
+        # Create and return service
+        return cls(config=service_config, **kwargs)
+
+    def update_config(self, new_config: Union[LLMServiceConfig, Dict[str, Any], str]) -> None:
+        """Update service configuration with new values.
+
+        Args:
+            new_config: New configuration (LLMServiceConfig, dict, or file path)
+        """
+        # Process new config based on type
+        if isinstance(new_config, str):
+            config_update = LLMServiceConfig.from_file(new_config)
+        elif isinstance(new_config, dict):
+            config_update = LLMServiceConfig.from_dict(new_config)
+        else:
+            config_update = new_config
+
+        # Update configuration
+        self.config.update(config_update)
+
+        # Reconfigure components with new settings
+        self._reconfigure_components()
+
+    def set_config_value(self, path: str, value: Any) -> None:
+        """Set a specific configuration value by path.
+
+        Args:
+            path: Dot-notation path to configuration value (e.g., "cache_config.ttl")
+            value: New value
+        """
+        # Parse path and set value
+        parts = path.split(".")
+        config_obj = self.config
+
+        # Navigate to the appropriate object
+        for part in parts[:-1]:
+            if hasattr(config_obj, part):
+                config_obj = getattr(config_obj, part)
+            else:
+                raise ValueError(f"Invalid configuration path: {path}")
+
+        # Set the value
+        if hasattr(config_obj, parts[-1]):
+            setattr(config_obj, parts[-1], value)
+        else:
+            raise ValueError(f"Invalid configuration path: {path}")
+
+        # Update components that depend on this value
+        self._reconfigure_components()
+
+    def _reconfigure_components(self) -> None:
+        """Reconfigure components based on updated configuration."""
+        # Reinitialize cache if cache configuration changed
+        if hasattr(self, "_init_cache"):
+            self._init_cache()
+
+        # Update provider timeouts
+        if hasattr(self.provider, "client") and hasattr(self.provider.client, "timeout"):
+            self.provider.client.timeout = self.config.timeouts.default_timeout
+
+        if hasattr(self.provider, "async_client") and hasattr(
+            self.provider.async_client, "timeout"
+        ):
+            self.provider.async_client.timeout = self.config.timeouts.default_timeout
+
+        # Update retry config
+        self.retry_config = self.config.retry_config or DEFAULT_RETRY_CONFIG
+
+        # Update orchestrator if needed
+        if hasattr(self, "orchestrator") and self.orchestrator:
+            # Update rate limits
+            if self.config.orchestrator_config.rate_limits:
+                for provider, rate in self.config.orchestrator_config.rate_limits.items():
+                    if provider in self.orchestrator.limiters:
+                        self.orchestrator.limiters[provider].rate = rate
+                    else:
+                        self.orchestrator.limiters[provider] = RateLimiter(rate=rate)
+
+            # Update max concurrent requests
+            self.orchestrator.max_concurrent = (
+                self.config.orchestrator_config.max_concurrent_requests
+            )
+
+        # Update provider pool if enabled
+        if self.config.enable_provider_pooling and not self.provider_pool:
+            self.provider_pool = self._init_provider_pool()
+        elif not self.config.enable_provider_pooling and self.provider_pool:
+            self.provider_pool = None
+        elif self.provider_pool:
+            # Update pool size
+            min_size, max_size = self.config.provider_pool_size
+            self.provider_pool = ProviderPool(
+                provider_factory=lambda: self._create_provider(self.provider_name, self.model_name),
+                min_size=min_size,
+                max_size=max_size,
+            )
+
+        # Update metrics collection
+        if self.config.enable_metrics and not self.metrics:
+            self.metrics = ServiceMetrics()
+        elif not self.config.enable_metrics and self.metrics:
+            self.metrics = None
+
+        # Check if we need to change provider or model
+        provider_name, model_name = self._resolve_provider_and_model()
+        if provider_name.lower() != self.provider_name or model_name != self.model_name:
+            # Update provider and model
+            self.provider_name = provider_name.lower()
+            self.model_name = model_name
+            self.provider = self._create_provider(self.provider_name, self.model_name)
+
+            # Reset validation status
+            self._model_validated = False
+            self._model_capabilities = None
+
+            logger.info(f"Reconfigured to use provider '{provider_name}' and model '{model_name}'")
+
+    def _load_config_instance(self) -> Optional[Any]:
         """Load the configuration instance.
 
         Returns:
-            Config instance
+            Config instance or None if global config is disabled
         """
+        if not self.use_global_config:
+            return None
+
         if self.config.config_path:
+            from enterprise_ai.config import Config
+
             return Config(config_path=self.config.config_path)
+
         return default_config
 
     def _resolve_provider_and_model(self) -> Tuple[str, str]:
@@ -202,17 +409,19 @@ class LLMService:
         provider_name = self.config.provider_name
         model_name = self.config.model_name
 
-        if not (provider_name and model_name):
-            # Use default LLM configuration
+        # Only use global config if allowed and needed
+        if not (provider_name and model_name) and self.use_global_config and self._config_instance:
             llm_config = self._config_instance.llm.get("default")
-            if not llm_config:
-                raise LLMError("No default LLM configuration found")
+            if llm_config:
+                provider_name = provider_name or llm_config.api_type
+                model_name = model_name or llm_config.model
 
-            provider_name = provider_name or llm_config.api_type
-            model_name = model_name or llm_config.model
+        # If still not resolved, use defaults
+        provider_name = provider_name or "openai"
+        model_name = model_name or "gpt-4o"
 
-        # Apply model selection strategy if provided
-        if self.config.model_selection and not self.config.model_name:
+        # Apply model selection strategy if available
+        if self.config.model_selection and self.config.model_selection.preferred_model:
             model_name = self.config.model_selection.preferred_model
 
         return provider_name, model_name
@@ -239,16 +448,26 @@ class LLMService:
 
         elif cache_config.cache_type == "hybrid":
             # Use the enhanced hybrid cache
-            cache_dir = cache_config.cache_dir
-            if not cache_dir:
-                cache_dir = self._config_instance.workspace_root / "cache" / "llm"
-                cache_dir.mkdir(parents=True, exist_ok=True)
+            # Create a definite Path object (not None)
+            cache_dir_path: Path
+            if cache_config.cache_dir is not None:
+                cache_dir_path = cache_config.cache_dir
+            elif self._config_instance is not None and hasattr(
+                self._config_instance, "workspace_root"
+            ):
+                cache_dir_path = self._config_instance.workspace_root / "cache" / "llm"
+            else:
+                # Fallback to a default directory
+                cache_dir_path = Path("./cache/llm")
+
+            # Now cache_dir_path is guaranteed to be a Path, not None
+            cache_dir_path.mkdir(parents=True, exist_ok=True)
 
             self.cache = HybridCache(
                 memory_ttl=cache_config.ttl,
                 disk_ttl=cache_config.ttl * 2 if cache_config.ttl else None,
                 memory_max_entries=cache_config.max_entries,
-                disk_cache_dir=cache_dir,
+                disk_cache_dir=cache_dir_path,  # Now this is a valid Path
                 disk_max_size_mb=cache_config.max_size_mb,
                 promotion_policy=cache_config.promotion_policy,
                 synchronize_writes=cache_config.synchronize_writes,
@@ -351,20 +570,19 @@ class LLMService:
             raise ProviderNotSupportedError(provider_name)
 
         # Get provider-specific configuration
-        provider_config = self._config_instance.llm.get(
-            provider_name, self._config_instance.llm.get("default")
-        )
+        if self._config_instance is not None and hasattr(self._config_instance, "llm"):
+            provider_config = self._config_instance.llm.get(
+                provider_name, self._config_instance.llm.get("default")
+            )
 
-        # Create provider configuration with appropriate timeouts
-        provider_config_dict: Dict[str, Any] = {}
-        if provider_config is not None:
-            provider_config_dict = {
-                "api_key": getattr(provider_config, "api_key", None),
-                "api_base": getattr(provider_config, "base_url", None),
-                "temperature": getattr(provider_config, "temperature", 0.7),
-                "max_tokens": getattr(provider_config, "max_tokens", None),
-                "request_timeout": self.config.timeouts.default_timeout,
-            }
+            if provider_config is not None:
+                provider_config_dict = {
+                    "api_key": getattr(provider_config, "api_key", None),
+                    "api_base": getattr(provider_config, "base_url", None),
+                    "temperature": getattr(provider_config, "temperature", 0.7),
+                    "max_tokens": getattr(provider_config, "max_tokens", None),
+                    "request_timeout": self.config.timeouts.default_timeout,
+                }
 
             # Add organization for OpenAI if available
             if provider_name == "openai" and hasattr(provider_config, "organization"):

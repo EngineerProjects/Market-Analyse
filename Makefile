@@ -57,6 +57,15 @@ clean:
 	@rm -rf build/ dist/ *.egg-info/ .pytest_cache/ .ruff_cache/ .mypy_cache/ htmlcov/ .coverage logs/
 	@find . -type d -name __pycache__ -exec rm -rf {} +
 
+notebook:
+	@echo "Checking for Jupyter Notebook..."
+	@if ! $(VENV)/bin/pip show notebook > /dev/null 2>&1; then \
+		echo "Installing Jupyter Notebook..."; \
+		uv pip install --python $(PYTHON) notebook; \
+	fi
+	@echo "Launching Jupyter Notebook..."
+	@$(VENV)/bin/jupyter notebook
+
 all: lint test pre-commit coverage
 help:
 	@echo "Enterprise-AI Development Makefile"
@@ -71,4 +80,5 @@ help:
 	@echo "serve-coverage - Serve coverage report on port 8000"
 	@echo "clean          - Remove build artifacts"
 	@echo "pre-commit     - Run all pre-commit checks"
+	@echo "notebook       - Launch Jupyter Notebook"
 	@echo "all            - Run full quality checks (lint + test + coverage)"
