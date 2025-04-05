@@ -1,0 +1,1206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>African Market Analysis 2025</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #2a6041;
+            --secondary-color: #f39c12;
+            --tertiary-color: #e74c3c;
+            --text-color: #333;
+            --light-bg: #f8f9fa;
+            --dark-bg: #343a40;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+        
+        .hero-section {
+            background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), 
+                        url('https://cdn.jsdelivr.net/gh/patak-dev/file-raw/main/african-market.jpg') no-repeat center center;
+            background-size: cover;
+            color: white;
+            padding: 8rem 1rem;
+            text-align: center;
+        }
+        
+        .nav-link {
+            position: relative;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-link:after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -5px;
+            left: 0;
+            background-color: var(--secondary-color);
+            transition: width 0.3s ease;
+        }
+        
+        .nav-link:hover:after {
+            width: 100%;
+        }
+        
+        .section-title {
+            position: relative;
+            margin-bottom: 2rem;
+            color: var(--primary-color);
+        }
+        
+        .section-title:after {
+            content: '';
+            position: absolute;
+            left: 0;
+            bottom: -10px;
+            width: 50px;
+            height: 3px;
+            background-color: var(--secondary-color);
+        }
+        
+        .card {
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .sector-card {
+            height: 100%;
+            border-left: 4px solid var(--primary-color);
+        }
+        
+        .challenge-card {
+            border-top: 4px solid var(--tertiary-color);
+        }
+        
+        .opportunity-card {
+            border-top: 4px solid var(--secondary-color);
+        }
+        
+        .chart-container {
+            width: 100%;
+            height: 300px;
+            margin: 20px 0;
+        }
+        
+        .citation {
+            font-size: 0.75rem;
+            color: #6c757d;
+            vertical-align: super;
+        }
+        
+        .references li {
+            margin-bottom: 0.5rem;
+        }
+        
+        #mobile-menu-button {
+            display: none;
+        }
+        
+        @media (max-width: 768px) {
+            #mobile-menu-button {
+                display: block;
+            }
+            
+            #main-nav {
+                display: none;
+                width: 100%;
+                position: absolute;
+                top: 70px;
+                left: 0;
+                background-color: white;
+                padding: 1rem;
+                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+                z-index: 1000;
+            }
+            
+            #main-nav.show {
+                display: block;
+            }
+            
+            #main-nav a {
+                display: block;
+                margin: 10px 0;
+                padding: 10px;
+                text-align: center;
+            }
+            
+            .section-title {
+                font-size: 1.5rem;
+            }
+        }
+        
+        .back-to-top {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: var(--primary-color);
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            transition: opacity 0.3s;
+            cursor: pointer;
+            z-index: 1000;
+        }
+        
+        .table-container {
+            overflow-x: auto;
+            margin: 2rem 0;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        table th {
+            background-color: var(--primary-color);
+            color: white;
+            text-align: left;
+            padding: 12px;
+        }
+        
+        table td {
+            padding: 10px 12px;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        table tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Header -->
+    <header class="sticky top-0 bg-white shadow-md z-50">
+        <div class="container mx-auto px-4 py-3">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center">
+                    <img src="./docs/logo1.png" alt="Logo" class="h-10 mr-3">
+                    <h1 class="text-lg font-bold text-green-800">African Market Analysis 2025</h1>
+                </div>
+                
+                <button id="mobile-menu-button" class="text-gray-600 focus:outline-none">
+                    <i class="fas fa-bars text-xl"></i>
+                </button>
+                
+                <nav id="main-nav" class="space-x-6">
+                    <a href="#executive-summary" class="nav-link text-gray-700 hover:text-green-700">Executive Summary</a>
+                    <a href="#market-landscape" class="nav-link text-gray-700 hover:text-green-700">Market Landscape</a>
+                    <a href="#challenges" class="nav-link text-gray-700 hover:text-green-700">Challenges</a>
+                    <a href="#opportunities" class="nav-link text-gray-700 hover:text-green-700">Opportunities</a>
+                    <a href="#investment" class="nav-link text-gray-700 hover:text-green-700">Investment</a>
+                    <a href="#geopolitical" class="nav-link text-gray-700 hover:text-green-700">Geopolitical</a>
+                    <a href="#strategic" class="nav-link text-gray-700 hover:text-green-700">Strategic Insights</a>
+                </nav>
+            </div>
+        </div>
+    </header>
+    
+    <!-- Hero Section -->
+    <section class="hero-section">
+        <div class="container mx-auto">
+            <h1 class="text-4xl md:text-5xl font-bold mb-4">African Market Analysis 2025</h1>
+            <p class="text-xl md:text-2xl max-w-3xl mx-auto">Comprehensive insights into Africa's evolving economic landscape, challenges, and opportunities</p>
+        </div>
+    </section>
+    
+    <!-- Executive Summary -->
+    <section id="executive-summary" class="py-16 bg-white">
+        <div class="container mx-auto px-4">
+            <h2 class="section-title text-3xl font-bold">Executive Summary</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div>
+                    <p class="mb-4">Africa's economic landscape is poised for transformative growth by 2025, with the continent projected to maintain a robust GDP growth rate of 3.8-4.5% despite global uncertainties<span class="citation">[1]</span>. The African Continental Free Trade Area (AfCFTA) is expected to reach full implementation, creating the world's largest free trade area with a combined GDP of $3.4 trillion<span class="citation">[2]</span>.</p>
+                    
+                    <p class="mb-4">The continent's digital economy continues its rapid expansion, with e-commerce expected to reach $180 billion by 2025 and mobile technology driving financial inclusion across previously underserved populations<span class="citation">[3]</span>. Renewable energy investments are projected to exceed $50 billion annually, addressing critical infrastructure gaps while aligning with global sustainability goals.</p>
+                    
+                    <p>Despite persistent challenges including political instability in key regions, infrastructure deficits, and climate vulnerability, Africa presents unprecedented opportunities for strategic investors. Those who understand the distinct regional dynamics, commit to sustainable development, and leverage technological innovations will be best positioned to participate in the continent's economic renaissance.</p>
+                </div>
+                <div class="bg-green-50 p-6 rounded-lg">
+                    <h3 class="text-xl font-bold text-green-800 mb-4">Key Metrics and Projections</h3>
+                    <ul class="space-y-3">
+                        <li class="flex items-start">
+                            <i class="fas fa-chart-line text-green-600 mt-1 mr-2"></i>
+                            <span>4.1% projected average GDP growth across Africa (2023-2025)</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-users text-green-600 mt-1 mr-2"></i>
+                            <span>1.4 billion population by 2025, with 65% under age 35</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-mobile-alt text-green-600 mt-1 mr-2"></i>
+                            <span>76% mobile penetration with 520 million smartphone users</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-shopping-cart text-green-600 mt-1 mr-2"></i>
+                            <span>$180 billion e-commerce market value projection</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-sun text-green-600 mt-1 mr-2"></i>
+                            <span>$50+ billion annual renewable energy investments</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-city text-green-600 mt-1 mr-2"></i>
+                            <span>45% urbanization rate with 12 cities exceeding 5 million residents</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Current African Market Landscape -->
+    <section id="market-landscape" class="py-16 bg-gray-50">
+        <div class="container mx-auto px-4">
+            <h2 class="section-title text-3xl font-bold">Current African Market Landscape</h2>
+            
+            <p class="mb-8">Africa's economic development continues to demonstrate resilience and diversification across multiple sectors, driven by technological adoption, policy reforms, and demographic advantages<span class="citation">[4]</span>.</p>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+                <!-- Technology & Digital Economy -->
+                <div class="card bg-white sector-card">
+                    <div class="p-6">
+                        <h3 class="text-xl font-bold mb-3 text-green-700">Technology & Digital Economy</h3>
+                        <p class="mb-3">Africa's tech ecosystem has seen unprecedented growth with over 600 active tech hubs across the continent and venture capital investments exceeding $7 billion in 2022<span class="citation">[5]</span>. Mobile money services continue to drive financial inclusion, with transaction values projected to reach $690 billion by 2025.</p>
+                        <p>Key developments include:</p>
+                        <ul class="list-disc pl-5 mb-4 space-y-1">
+                            <li>Fintech dominance, capturing 31% of all African startup funding</li>
+                            <li>Expansion of 5G networks across 18 countries</li>
+                            <li>Government-led digital transformation initiatives</li>
+                            <li>Growing local SaaS and AI solution providers</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <!-- Agriculture & Agritech -->
+                <div class="card bg-white sector-card">
+                    <div class="p-6">
+                        <h3 class="text-xl font-bold mb-3 text-green-700">Agriculture & Agritech</h3>
+                        <p class="mb-3">Agriculture remains the backbone of many African economies, employing over 60% of the continent's workforce. The sector is undergoing transformation through technology adoption, with agritech startups attracting $482 million in investment in 2022<span class="citation">[6]</span>.</p>
+                        <p>Notable trends include:</p>
+                        <ul class="list-disc pl-5 mb-4 space-y-1">
+                            <li>Precision farming and IoT sensor deployment</li>
+                            <li>Climate-smart agricultural practices</li>
+                            <li>Digital marketplaces connecting farmers directly to buyers</li>
+                            <li>Value-added processing facilities to reduce post-harvest losses</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <!-- Healthcare & Pharmaceuticals -->
+                <div class="card bg-white sector-card">
+                    <div class="p-6">
+                        <h3 class="text-xl font-bold mb-3 text-green-700">Healthcare & Pharmaceuticals</h3>
+                        <p class="mb-3">Africa's healthcare sector is experiencing rapid growth, valued at $259 billion in 2022 with projections to reach $390 billion by 2025<span class="citation">[7]</span>. The pharmaceutical market is expanding at 10% CAGR, driven by local manufacturing initiatives and healthcare technology adoption.</p>
+                        <p>Key developments include:</p>
+                        <ul class="list-disc pl-5 mb-4 space-y-1">
+                            <li>Telemedicine platforms experiencing 300% user growth since 2020</li>
+                            <li>Pharmaceutical manufacturing hubs in Egypt, Morocco, and South Africa</li>
+                            <li>Medical drone delivery networks in Rwanda, Ghana, and Nigeria</li>
+                            <li>Public-private partnerships for healthcare infrastructure development</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <!-- Renewable Energy & Infrastructure -->
+                <div class="card bg-white sector-card">
+                    <div class="p-6">
+                        <h3 class="text-xl font-bold mb-3 text-green-700">Renewable Energy & Infrastructure</h3>
+                        <p class="mb-3">Africa's energy landscape is pivoting toward renewables, with the continent possessing 60% of the world's best solar resources. Total renewable energy capacity is projected to exceed 100 GW by 2025, up from 58 GW in 2021<span class="citation">[8]</span>.</p>
+                        <p>Significant developments include:</p>
+                        <ul class="list-disc pl-5 mb-4 space-y-1">
+                            <li>Large-scale solar projects in Egypt, Morocco, and South Africa</li>
+                            <li>Mini-grid solutions expanding energy access in rural areas</li>
+                            <li>Green hydrogen initiatives in Namibia, Mauritania, and Egypt</li>
+                            <li>Cross-border transport infrastructure through the Program for Infrastructure Development in Africa (PIDA)</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <!-- Financial Services -->
+                <div class="card bg-white sector-card">
+                    <div class="p-6">
+                        <h3 class="text-xl font-bold mb-3 text-green-700">Financial Services</h3>
+                        <p class="mb-3">The financial services sector is undergoing rapid transformation through digital innovation. Banking penetration has increased to 48% of the adult population, while mobile money accounts have surpassed 600 million<span class="citation">[9]</span>.</p>
+                        <p>Emerging trends include:</p>
+                        <ul class="list-disc pl-5 mb-4 space-y-1">
+                            <li>Neobanks and digital-only financial institutions</li>
+                            <li>Cross-border payment solutions addressing intra-African trade</li>
+                            <li>Regulated cryptocurrency adoption in Kenya, Nigeria, and South Africa</li>
+                            <li>Expansion of micro-insurance services through digital platforms</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <!-- Consumer Goods & Retail -->
+                <div class="card bg-white sector-card">
+                    <div class="p-6">
+                        <h3 class="text-xl font-bold mb-3 text-green-700">Consumer Goods & Retail</h3>
+                        <p class="mb-3">Africa's consumer class continues to expand, with household consumption projected to reach $2.5 trillion by 2025<span class="citation">[10]</span>. E-commerce penetration is accelerating, with the sector growing at 28% annually since 2020.</p>
+                        <p>Notable developments include:</p>
+                        <ul class="list-disc pl-5 mb-4 space-y-1">
+                            <li>Omnichannel retail strategies combining traditional markets with digital platforms</li>
+                            <li>Growth of quick-commerce and under-30-minute delivery models</li>
+                            <li>Localization of global brands to meet African consumer preferences</li>
+                            <li>Expansion of organized retail through shopping mall development in secondary cities</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="bg-white p-6 rounded-lg shadow">
+                <h3 class="text-xl font-bold mb-4 text-green-700">Regional Economic Performance</h3>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Region</th>
+                                <th>GDP Growth (2023-2025 avg.)</th>
+                                <th>Key Economic Drivers</th>
+                                <th>Investment Hotspots</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>North Africa</td>
+                                <td>4.3%</td>
+                                <td>Manufacturing, energy, tourism</td>
+                                <td>Egypt (New Administrative Capital), Morocco (renewable energy)</td>
+                            </tr>
+                            <tr>
+                                <td>East Africa</td>
+                                <td>5.2%</td>
+                                <td>Services, agriculture, ICT</td>
+                                <td>Kenya (tech ecosystem), Ethiopia (manufacturing)</td>
+                            </tr>
+                            <tr>
+                                <td>West Africa</td>
+                                <td>3.8%</td>
+                                <td>Natural resources, agriculture, fintech</td>
+                                <td>Nigeria (digital economy), Ghana (infrastructure)</td>
+                            </tr>
+                            <tr>
+                                <td>Central Africa</td>
+                                <td>3.1%</td>
+                                <td>Extractives, forestry, agriculture</td>
+                                <td>Rwanda (innovation), DRC (critical minerals)</td>
+                            </tr>
+                            <tr>
+                                <td>Southern Africa</td>
+                                <td>2.9%</td>
+                                <td>Mining, manufacturing, financial services</td>
+                                <td>South Africa (renewable energy), Botswana (logistics)</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Key Challenges -->
+    <section id="challenges" class="py-16 bg-white">
+        <div class="container mx-auto px-4">
+            <h2 class="section-title text-3xl font-bold">Key Challenges</h2>
+            
+            <p class="mb-8">Despite promising growth trajectories, Africa's economic development faces several significant obstacles that require strategic solutions<span class="citation">[11]</span>:</p>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Infrastructure Deficits -->
+                <div class="card bg-white challenge-card p-6">
+                    <div class="flex items-center mb-4">
+                        <i class="fas fa-road text-2xl text-red-600 mr-3"></i>
+                        <h3 class="text-xl font-bold">Infrastructure Deficits</h3>
+                    </div>
+                    <p class="mb-3">Africa faces an annual infrastructure financing gap of $68-108 billion, with critical shortfalls in transportation, energy, and digital connectivity<span class="citation">[12]</span>.</p>
+                    <ul class="list-disc pl-5 space-y-1">
+                        <li>Only 43% of roads are paved across the continent</li>
+                        <li>600 million people lack access to electricity</li>
+                        <li>Broadband penetration remains below 40%</li>
+                    </ul>
+                </div>
+                
+                <!-- Political Instability -->
+                <div class="card bg-white challenge-card p-6">
+                    <div class="flex items-center mb-4">
+                        <i class="fas fa-balance-scale text-2xl text-red-600 mr-3"></i>
+                        <h3 class="text-xl font-bold">Political Instability</h3>
+                    </div>
+                    <p class="mb-3">Governance challenges and political volatility continue to disrupt economic development in several regions, with nine countries experiencing coups or attempted coups since 2020<span class="citation">[13]</span>.</p>
+                    <ul class="list-disc pl-5 space-y-1">
+                        <li>Sahel region facing significant security challenges</li>
+                        <li>Regulatory unpredictability affecting investor confidence</li>
+                        <li>Corruption inhibiting efficient resource allocation</li>
+                    </ul>
+                </div>
+                
+                <!-- Climate Vulnerability -->
+                <div class="card bg-white challenge-card p-6">
+                    <div class="flex items-center mb-4">
+                        <i class="fas fa-cloud-sun-rain text-2xl text-red-600 mr-3"></i>
+                        <h3 class="text-xl font-bold">Climate Vulnerability</h3>
+                    </div>
+                    <p class="mb-3">Africa is disproportionately affected by climate change despite contributing only 4% of global carbon emissions. Annual economic losses from climate events are estimated at $15 billion<span class="citation">[14]</span>.</p>
+                    <ul class="list-disc pl-5 space-y-1">
+                        <li>Agricultural yields projected to decrease by up to 30% in some regions</li>
+                        <li>Water scarcity affecting 25 countries</li>
+                        <li>Coastal cities threatened by rising sea levels</li>
+                    </ul>
+                </div>
+                
+                <!-- Skills Gap -->
+                <div class="card bg-white challenge-card p-6">
+                    <div class="flex items-center mb-4">
+                        <i class="fas fa-user-graduate text-2xl text-red-600 mr-3"></i>
+                        <h3 class="text-xl font-bold">Skills Gap</h3>
+                    </div>
+                    <p class="mb-3">Despite a growing youth population, education systems struggle to produce graduates with market-relevant skills. Only 22% of African university graduates have STEM qualifications<span class="citation">[15]</span>.</p>
+                    <ul class="list-disc pl-5 space-y-1">
+                        <li>70% of employers cite skills mismatches as a hiring constraint</li>
+                        <li>Digital literacy remains below 30% in many countries</li>
+                        <li>Technical and vocational training systems underdeveloped</li>
+                    </ul>
+                </div>
+                
+                <!-- Limited Access to Finance -->
+                <div class="card bg-white challenge-card p-6">
+                    <div class="flex items-center mb-4">
+                        <i class="fas fa-money-bill-wave text-2xl text-red-600 mr-3"></i>
+                        <h3 class="text-xl font-bold">Limited Access to Finance</h3>
+                    </div>
+                    <p class="mb-3">MSMEs face a $330 billion financing gap, with only 20% of African SMEs having access to bank loans despite contributing 80% of employment<span class="citation">[16]</span>.</p>
+                    <ul class="list-disc pl-5 space-y-1">
+                        <li>High interest rates (15-25% in many markets)</li>
+                        <li>Limited venture capital reaching early-stage businesses</li>
+                        <li>Underdeveloped credit reporting infrastructure</li>
+                    </ul>
+                </div>
+                
+                <!-- Supply Chain Vulnerabilities -->
+                <div class="card bg-white challenge-card p-6">
+                    <div class="flex items-center mb-4">
+                        <i class="fas fa-truck text-2xl text-red-600 mr-3"></i>
+                        <h3 class="text-xl font-bold">Supply Chain Vulnerabilities</h3>
+                    </div>
+                    <p class="mb-3">Intra-African trade remains at just 14.4% of total continental trade, with logistical inefficiencies adding 40-60% to product costs<span class="citation">[17]</span>.</p>
+                    <ul class="list-disc pl-5 space-y-1">
+                        <li>Border crossing delays averaging 12+ hours</li>
+                        <li>Limited cold chain infrastructure (30% coverage)</li>
+                        <li>Fragmented production networks</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Entrepreneurial Opportunities -->
+    <section id="opportunities" class="py-16 bg-gray-50">
+        <div class="container mx-auto px-4">
+            <h2 class="section-title text-3xl font-bold">Entrepreneurial Opportunities</h2>
+            
+            <p class="mb-8">Africa's economic landscape presents numerous high-potential opportunities for entrepreneurs and businesses across various sectors<span class="citation">[18]</span>:</p>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- AgriTech Revolution -->
+                <div class="card bg-white opportunity-card p-6">
+                    <div class="flex items-center mb-4">
+                        <i class="fas fa-seedling text-2xl text-yellow-600 mr-3"></i>
+                        <h3 class="text-xl font-bold">AgriTech Revolution</h3>
+                    </div>
+                    <p class="mb-3">Africa's $1 trillion food market is undergoing technological transformation, creating opportunities in farm management, supply chain optimization, and direct-to-consumer platforms<span class="citation">[19]</span>.</p>
+                    <h4 class="font-bold mt-4 mb-2">High-Potential Areas:</h4>
+                    <ul class="list-disc pl-5 space-y-1">
+                        <li>IoT-enabled precision farming solutions</li>
+                        <li>Mobile marketplace platforms connecting farmers to markets</li>
+                        <li>Alternative protein development using indigenous ingredients</li>
+                        <li>Climate-resilient seed development and distribution</li>
+                    </ul>
+                </div>
+                
+                <!-- Healthcare Innovation -->
+                <div class="card bg-white opportunity-card p-6">
+                    <div class="flex items-center mb-4">
+                        <i class="fas fa-heartbeat text-2xl text-yellow-600 mr-3"></i>
+                        <h3 class="text-xl font-bold">Healthcare Innovation</h3>
+                    </div>
+                    <p class="mb-3">Africa's healthcare market is projected to be worth $446 billion by 2030, with technology-enabled solutions addressing accessibility, affordability, and quality challenges<span class="citation">[20]</span>.</p>
+                    <h4 class="font-bold mt-4 mb-2">High-Potential Areas:</h4>
+                    <ul class="list-disc pl-5 space-y-1">
+                        <li>Telemedicine platforms for remote consultations</li>
+                        <li>Diagnostic AI for resource-constrained settings</li>
+                        <li>Pharmaceutical e-commerce and last-mile delivery</li>
+                        <li>Medical equipment leasing models for clinics</li>
+                    </ul>
+                </div>
+                
+                <!-- Fintech Expansion -->
+                <div class="card bg-white opportunity-card p-6">
+                    <div class="flex items-center mb-4">
+                        <i class="fas fa-credit-card text-2xl text-yellow-600 mr-3"></i>
+                        <h3 class="text-xl font-bold">Fintech Expansion</h3>
+                    </div>
+                    <p class="mb-3">Building on mobile money success, Africa's fintech space continues to evolve with opportunities in embedded finance, SME solutions, and cross-border payments<span class="citation">[21]</span>.</p>
+                    <h4 class="font-bold mt-4 mb-2">High-Potential Areas:</h4>
+                    <ul class="list-disc pl-5 space-y-1">
+                        <li>BNPL (Buy Now Pay Later) platforms for emerging consumers</li>
+                        <li>Digital banking solutions for underserved SMEs</li>
+                        <li>Cross-border remittance alternatives to traditional services</li>
+                        <li>Asset tokenization for fractional investment opportunities</li>
+                    </ul>
+                </div>
+                
+                <!-- Renewable Energy -->
+                <div class="card bg-white opportunity-card p-6">
+                    <div class="flex items-center mb-4">
+                        <i class="fas fa-solar-panel text-2xl text-yellow-600 mr-3"></i>
+                        <h3 class="text-xl font-bold">Renewable Energy</h3>
+                    </div>
+                    <p class="mb-3">Africa's abundant renewable resources and energy access challenges create significant opportunities in clean energy solutions, with the sector attracting $5.5 billion in investment in 2022<span class="citation">[22]</span>.</p>
+                    <h4 class="font-bold mt-4 mb-2">High-Potential Areas:</h4>
+                    <ul class="list-disc pl-5 space-y-1">
+                        <li>Solar home systems with flexible payment options</li>
+                        <li>Mini-grid development for rural communities</li>
+                        <li>Energy efficiency solutions for commercial buildings</li>
+                        <li>Clean cooking technology alternatives to biomass fuels</li>
+                    </ul>
+                </div>
+                
+                <!-- Education Technology -->
+                <div class="card bg-white opportunity-card p-6">
+                    <div class="flex items-center mb-4">
+                        <i class="fas fa-laptop-code text-2xl text-yellow-600 mr-3"></i>
+                        <h3 class="text-xl font-bold">Education Technology</h3>
+                    </div>
+                    <p class="mb-3">Africa's edtech market is growing at 24% annually, with opportunities in workforce development, personalized learning, and infrastructure solutions<span class="citation">[23]</span>.</p>
+                    <h4 class="font-bold mt-4 mb-2">High-Potential Areas:</h4>
+                    <ul class="list-disc pl-5 space-y-1">
+                        <li>Mobile-first learning platforms with offline capabilities</li>
+                        <li>Technical and vocational skills development programs</li>
+                        <li>School management systems for educational institutions</li>
+                        <li>Affordable educational hardware with preloaded content</li>
+                    </ul>
+                </div>
+                
+                <!-- Circular Economy Solutions -->
+                <div class="card bg-white opportunity-card p-6">
+                    <div class="flex items-center mb-4">
+                        <i class="fas fa-recycle text-2xl text-yellow-600 mr-3"></i>
+                        <h3 class="text-xl font-bold">Circular Economy Solutions</h3>
+                    </div>
+                    <p class="mb-3">Waste management and recycling present $8 billion in annual opportunities across Africa, with innovative models addressing environmental challenges while creating economic value<span class="citation">[24]</span>.</p>
+                    <h4 class="font-bold mt-4 mb-2">High-Potential Areas:</h4>
+                    <ul class="list-disc pl-5 space-y-1">
+                        <li>Plastic waste collection and recycling networks</li>
+                        <li>E-waste recovery and component refurbishment</li>
+                        <li>Organic waste conversion to agricultural inputs</li>
+                        <li>Sustainable packaging alternatives for consumer goods</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Investment Analysis -->
+    <section id="investment" class="py-16 bg-white">
+        <div class="container mx-auto px-4">
+            <h2 class="section-title text-3xl font-bold">Investment Analysis</h2>
+            
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
+                <div>
+                    <p class="mb-4">Africa's investment landscape continues to evolve, with total foreign direct investment (FDI) reaching $83 billion in 2022, a 12% increase from the previous year<span class="citation">[25]</span>. Investment flows are diversifying both by source and destination sector, reflecting the continent's broader economic transformation.</p>
+                    
+                    <p class="mb-4">Traditional Western investors are being joined by increased activity from China, Gulf states, and intra-African investors, creating a more competitive landscape. While extractive industries continue to attract significant capital, technology, renewable energy, and consumer-focused sectors are gaining momentum<span class="citation">[26]</span>.</p>
+                    
+                    <p>Notably, venture capital investment in African startups reached a record $6.5 billion in 2022, though 2023 saw a correction in line with global trends. Despite this adjustment, early-stage funding has demonstrated resilience, particularly in fintech, climate tech, and health tech verticals<span class="citation">[27]</span>.</p>
+                </div>
+                
+                <div class="bg-white rounded-lg shadow p-6">
+                    <h3 class="text-xl font-bold text-green-700 mb-4">FDI Inflows by Sector (2022-2023)</h3>
+                    <div class="chart-container" id="sector-chart">
+                        <canvas id="sectorChart"></canvas>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
+                <div class="bg-green-50 p-6 rounded-lg">
+                    <h3 class="text-xl font-bold text-green-800 mb-4">Investment Risk Analysis</h3>
+                    <div class="space-y-4">
+                        <div>
+                            <h4 class="font-bold">Regulatory Risk</h4>
+                            <p class="text-sm mt-1">Policy unpredictability and regulatory changes present significant challenges, particularly in mining, telecommunications, and financial services sectors. Investors are advised to engage early with regulatory stakeholders and maintain flexibility in operational structures.</p>
+                        </div>
+                        <div>
+                            <h4 class="font-bold">Currency Risk</h4>
+                            <p class="text-sm mt-1">Volatility in local currencies has impacted returns for dollar-denominated investors. Hedging strategies, local debt financing, and natural hedges through export-oriented businesses can mitigate these risks.</p>
+                        </div>
+                        <div>
+                            <h4 class="font-bold">Political Risk</h4>
+                            <p class="text-sm mt-1">Political transitions and regional conflicts continue to present challenges in select markets. Political risk insurance, phased investment approaches, and geographic diversification are recommended risk management strategies.</p>
+                        </div>
+                        <div>
+                            <h4 class="font-bold">Infrastructure Risk</h4>
+                            <p class="text-sm mt-1">Logistics, power, and connectivity limitations can impact operational efficiency and costs. Successful investors often adopt integrated approaches, including selective infrastructure investment to support core operations.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-white p-6 rounded-lg shadow">
+                    <h3 class="text-xl font-bold text-green-700 mb-4">Investment Returns by Region</h3>
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Region</th>
+                                    <th>Avg. ROI (Private Equity)</th>
+                                    <th>Avg. ROI (Public Markets)</th>
+                                    <th>Risk Rating</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>North Africa</td>
+                                    <td>16.2%</td>
+                                    <td>12.5%</td>
+                                    <td>Moderate</td>
+                                </tr>
+                                <tr>
+                                    <td>East Africa</td>
+                                    <td>18.7%</td>
+                                    <td>14.3%</td>
+                                    <td>Moderate-High</td>
+                                </tr>
+                                <tr>
+                                    <td>West Africa</td>
+                                    <td>21.5%</td>
+                                    <td>13.8%</td>
+                                    <td>High</td>
+                                </tr>
+                                <tr>
+                                    <td>Central Africa</td>
+                                    <td>19.8%</td>
+                                    <td>11.2%</td>
+                                    <td>Very High</td>
+                                </tr>
+                                <tr>
+                                    <td>Southern Africa</td>
+                                    <td>15.4%</td>
+                                    <td>13.1%</td>
+                                    <td>Moderate</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="bg-white rounded-lg shadow p-6">
+                <h3 class="text-xl font-bold text-green-700 mb-4">Strategic Investment Recommendations</h3>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="border-l-4 border-green-500 p-4 bg-green-50">
+                        <h4 class="font-bold">For Strategic Corporate Investors</h4>
+                        <ul class="list-disc pl-5 mt-2 space-y-1 text-sm">
+                            <li>Adopt phased market entry strategies, beginning with partnership models</li>
+                            <li>Localize products and business models for distinct regional markets</li>
+                            <li>Invest in local talent development to build sustainable operations</li>
+                            <li>Consider special economic zones for manufacturing and processing investments</li>
+                        </ul>
+                    </div>
+                    <div class="border-l-4 border-blue-500 p-4 bg-blue-50">
+                        <h4 class="font-bold">For Financial Investors</h4>
+                        <ul class="list-disc pl-5 mt-2 space-y-1 text-sm">
+                            <li>Diversify portfolios across multiple countries to mitigate country-specific risks</li>
+                            <li>Focus on sectors with strong fundamentals: financial inclusion, healthcare, consumer goods</li>
+                            <li>Structure investments with appropriate governance mechanisms and exit flexibility</li>
+                            <li>Consider blended finance approaches for infrastructure and climate-related investments</li>
+                        </ul>
+                    </div>
+                    <div class="border-l-4 border-purple-500 p-4 bg-purple-50">
+                        <h4 class="font-bold">For Impact Investors</h4>
+                        <ul class="list-disc pl-5 mt-2 space-y-1 text-sm">
+                            <li>Target sectors with dual return potential: clean energy, healthcare, education</li>
+                            <li>Partner with local impact accelerators to access pipeline and support</li>
+                            <li>Develop appropriate metrics that capture both financial and social/environmental returns</li>
+                            <li>Consider patient capital structures that accommodate longer development timelines</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Geopolitical Assessment -->
+    <section id="geopolitical" class="py-16 bg-gray-50">
+        <div class="container mx-auto px-4">
+            <h2 class="section-title text-3xl font-bold">Geopolitical Assessment</h2>
+            
+            <p class="mb-8">Africa's strategic importance in global affairs continues to grow, with multiple global powers seeking to strengthen their influence across the continent<span class="citation">[28]</span>. These geopolitical dynamics directly impact business environments, investment frameworks, and economic partnerships.</p>
+            
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
+                <div>
+                    <h3 class="text-xl font-bold text-green-700 mb-4">Global Powers in Africa</h3>
+                    
+                    <div class="space-y-6">
+                        <div class="border-b pb-4">
+                            <h4 class="font-bold">China's Evolving Approach</h4>
+                            <p class="mt-2">China remains Africa's largest bilateral trading partner with trade volume exceeding $254 billion in 2022<span class="citation">[29]</span>. However, Beijing's engagement is evolving from infrastructure-focused lending to more diverse commercial investments in manufacturing, digital technology, and services. The Belt and Road Initiative continues to shape development corridors, though with more scrutiny on financial sustainability.</p>
+                        </div>
+                        
+                        <div class="border-b pb-4">
+                            <h4 class="font-bold">Western Reengagement</h4>
+                            <p class="mt-2">The United States, European Union, and United Kingdom have launched new Africa strategies emphasizing private sector investment, security cooperation, and climate partnerships. The G7's Partnership for Global Infrastructure and Investment (PGII) and the EU's Global Gateway offer alternatives to Chinese financing models, with enhanced focus on transparency and governance<span class="citation">[30]</span>.</p>
+                        </div>
+                        
+                        <div class="border-b pb-4">
+                            <h4 class="font-bold">Gulf States' Strategic Investments</h4>
+                            <p class="mt-2">The UAE, Saudi Arabia, and Qatar have significantly increased their economic presence across Africa, focusing on ports, logistics, agribusiness, and renewable energy. These investments often align with food security objectives and economic diversification strategies of Gulf nations<span class="citation">[31]</span>.</p>
+                        </div>
+                        
+                        <div>
+                            <h4 class="font-bold">Russia's Security-Commercial Nexus</h4>
+                            <p class="mt-2">Russia has expanded its influence through security partnerships, particularly in the Sahel and Central Africa. These arrangements often facilitate access to natural resources and create openings for Russian companies in mining and energy sectors<span class="citation">[32]</span>.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div>
+                    <h3 class="text-xl font-bold text-green-700 mb-4">Regional Integration & Conflict Zones</h3>
+                    
+                    <div class="bg-white p-6 rounded-lg shadow mb-6">
+                        <h4 class="font-bold">African Continental Free Trade Area (AfCFTA)</h4>
+                        <p class="mt-2 mb-4">The AfCFTA represents Africa's most ambitious integration initiative, aiming to create a single market of 1.3 billion people. Implementation continues to progress with 47 of 54 signatories having ratified the agreement<span class="citation">[33]</span>. Early trading has begun, though significant challenges remain in harmonizing standards, reducing non-tariff barriers, and developing rules of origin frameworks.</p>
+                        
+                        <h5 class="font-bold text-sm">Key AfCFTA Developments:</h5>
+                        <ul class="list-disc pl-5 mt-2 space-y-1 text-sm">
+                            <li>Guided Trade Initiative launched with eight participating countries</li>
+                            <li>Pan-African Payment and Settlement System reducing transaction costs</li>
+                            <li>Digital trade protocol under negotiation</li>
+                            <li>Ongoing negotiations on investment and intellectual property protocols</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="bg-red-50 p-6 rounded-lg">
+                        <h4 class="font-bold text-red-800">Active Conflict Zones</h4>
+                        <p class="mt-2 mb-4">Several regional conflicts impact economic activity and investment flows across the continent<span class="citation">[34]</span>:</p>
+                        
+                        <div class="space-y-4 text-sm">
+                            <div>
+                                <h5 class="font-bold">Sahel Region</h5>
+                                <p>Political instability and insurgent activity across Mali, Burkina Faso, and Niger have disrupted regional trade and led to the suspension of Western development assistance. Military governments in these countries have pivoted toward Russian security partnerships.</p>
+                            </div>
+                            
+                            <div>
+                                <h5 class="font-bold">Ethiopia</h5>
+                                <p>Despite the Tigray peace agreement, tensions remain in multiple regions. The economic impact includes significant reconstruction needs estimated at $20 billion and disrupted agricultural production.</p>
+                            </div>
+                            
+                            <div>
+                                <h5 class="font-bold">Sudan</h5>
+                                <p>The ongoing conflict between military factions has devastated infrastructure and created a humanitarian crisis. Economic activity in Khartoum has declined by 75%, with significant impacts on regional supply chains.</p>
+                            </div>
+                            
+                            <div>
+                                <h5 class="font-bold">Eastern DRC</h5>
+                                <p>Renewed conflict has disrupted critical mineral supply chains and created security challenges for mining operations. Regional tensions between DRC and Rwanda further complicate resolution efforts.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="bg-white rounded-lg shadow p-6">
+                <h3 class="text-xl font-bold text-green-700 mb-4">Strategic Implications for Businesses</h3>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <h4 class="font-bold mb-3">Navigating Geopolitical Competition</h4>
+                        <ul class="list-disc pl-5 space-y-2">
+                            <li>Diversify partnerships across multiple global and regional stakeholders</li>
+                            <li>Maintain political neutrality while engaging with key power brokers</li>
+                            <li>Monitor shifting sanctions regimes that may impact operations</li>
+                            <li>Develop scenario planning for potential geopolitical shifts</li>
+                        </ul>
+                    </div>
+                    
+                    <div>
+                        <h4 class="font-bold mb-3">Leveraging Regional Integration</h4>
+                        <ul class="list-disc pl-5 space-y-2">
+                            <li>Position operations to capitalize on AfCFTA implementation</li>
+                            <li>Design hub-and-spoke strategies targeting regional economic communities</li>
+                            <li>Build flexibility into supply chains to accommodate changing trade rules</li>
+                            <li>Engage with regional standards bodies to influence harmonization processes</li>
+                        </ul>
+                    </div>
+                    
+                    <div>
+                        <h4 class="font-bold mb-3">Resource Security Considerations</h4>
+                        <ul class="list-disc pl-5 space-y-2">
+                            <li>Assess critical mineral strategies of major powers when investing in extractive sectors</li>
+                            <li>Anticipate increased competition for agricultural land and water resources</li>
+                            <li>Monitor emerging green transition partnerships that may reshape resource markets</li>
+                            <li>Consider resource nationalism risks in strategic planning</li>
+                        </ul>
+                    </div>
+                    
+                    <div>
+                        <h4 class="font-bold mb-3">Security Risk Management</h4>
+                        <ul class="list-disc pl-5 space-y-2">
+                            <li>Develop comprehensive security strategies beyond physical protection</li>
+                            <li>Build relationships with multiple security stakeholders</li>
+                            <li>Invest in community engagement to enhance social license to operate</li>
+                            <li>Consider regional rather than country-specific security dynamics</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Strategic Insights -->
+    <section id="strategic" class="py-16 bg-white">
+        <div class="container mx-auto px-4">
+            <h2 class="section-title text-3xl font-bold">Strategic Insights</h2>
+            
+            <p class="mb-8">Drawing from our comprehensive analysis, we present strategic insights to guide decision-makers navigating Africa's complex but promising economic landscape<span class="citation">[35]</span>:</p>
+            
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-12">
+                <div class="col-span-1 lg:col-span-2">
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <h3 class="text-xl font-bold text-green-700 mb-4">Key Strategic Insights</h3>
+                        
+                        <div class="space-y-6">
+                            <div class="border-b pb-4">
+                                <h4 class="font-bold">Localization is Essential</h4>
+                                <p class="mt-2">Successful market entry strategies must be tailored to specific regional contexts rather than treating Africa as a monolithic market. Companies that invest in local adaptation, talent development, and contextual understanding consistently outperform those applying standardized global approaches<span class="citation">[36]</span>.</p>
+                            </div>
+                            
+                            <div class="border-b pb-4">
+                                <h4 class="font-bold">Digital Infrastructure as Competitive Advantage</h4>
+                                <p class="mt-2">As Africa's digital transformation accelerates, companies that contribute to digital infrastructure development gain significant competitive advantages in market access and customer relationships. Strategic investments in connectivity, digital payment rails, and technology skills development yield outsized returns<span class="citation">[37]</span>.</p>
+                            </div>
+                            
+                            <div class="border-b pb-4">
+                                <h4 class="font-bold">Climate Adaptation Creates Opportunities</h4>
+                                <p class="mt-2">Africa's climate vulnerability presents significant business opportunities in resilient infrastructure, agricultural adaptation, water management, and renewable energy. Early movers in climate-smart solutions are establishing strong market positions across multiple sectors<span class="citation">[38]</span>.</p>
+                            </div>
+                            
+                            <div class="border-b pb-4">
+                                <h4 class="font-bold">Ecosystem Development Over Standalone Ventures</h4>
+                                <p class="mt-2">Given infrastructure and market development challenges, businesses that invest in building supportive ecosystems rather than standalone ventures achieve greater sustainability. Successful approaches include integrated value chains, multi-stakeholder partnerships, and industry cluster development<span class="citation">[39]</span>.</p>
+                            </div>
+                            
+                            <div>
+                                <h4 class="font-bold">Strategic Patience with Operational Flexibility</h4>
+                                <p class="mt-2">Africa's markets require longer investment horizons but demand significant operational agility. Organizations that combine long-term strategic commitment with adaptable business models and scenario planning are best positioned to navigate uncertainties while capturing growth opportunities<span class="citation">[40]</span>.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div>
+                    <div class="bg-green-50 p-6 rounded-lg mb-6">
+                        <h3 class="text-xl font-bold text-green-800 mb-4">Strategic Planning Framework</h3>
+                        
+                        <p class="text-sm mb-4">For organizations developing Africa market strategies, we recommend a structured approach encompassing:</p>
+                        
+                        <div class="space-y-4">
+                            <div class="bg-white p-3 rounded">
+                                <h4 class="font-bold text-sm">1. Market Prioritization</h4>
+                                <p class="text-xs mt-1">Develop systematic criteria for market selection based on sector-specific opportunities, risk profiles, and organizational capabilities.</p>
+                            </div>
+                            
+                            <div class="bg-white p-3 rounded">
+                                <h4 class="font-bold text-sm">2. Partnership Strategy</h4>
+                                <p class="text-xs mt-1">Identify complementary local and international partners across the value chain, with clear alignment on objectives and governance frameworks.</p>
+                            </div>
+                            
+                            <div class="bg-white p-3 rounded">
+                                <h4 class="font-bold text-sm">3. Resource Allocation</h4>
+                                <p class="text-xs mt-1">Balance investments across markets at different maturity levels, with appropriate return expectations and performance metrics.</p>
+                            </div>
+                            
+                            <div class="bg-white p-3 rounded">
+                                <h4 class="font-bold text-sm">4. Talent Development</h4>
+                                <p class="text-xs mt-1">Build comprehensive strategies for developing local leadership and technical capabilities as a core competitive advantage.</p>
+                            </div>
+                            
+                            <div class="bg-white p-3 rounded">
+                                <h4 class="font-bold text-sm">5. Regulatory Engagement</h4>
+                                <p class="text-xs mt-1">Develop proactive approaches to regulatory relations that contribute constructively to policy development while advancing business objectives.</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-blue-50 p-6 rounded-lg">
+                        <h3 class="text-xl font-bold text-blue-800 mb-4">Future Research Agenda</h3>
+                        
+                        <p class="text-sm mb-4">Key areas requiring deeper investigation include:</p>
+                        
+                        <ul class="list-disc pl-5 space-y-2 text-sm">
+                            <li>Effective models for technology transfer and adaptation</li>
+                            <li>Regional regulatory harmonization progress and barriers</li>
+                            <li>Climate change impacts on specific value chains</li>
+                            <li>Youth employment strategies across diverse economic contexts</li>
+                            <li>Emerging consumer behavior patterns across income segments</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="bg-white rounded-lg shadow p-6">
+                <h3 class="text-xl font-bold text-green-700 mb-4">Sectoral Outlook Summary</h3>
+                
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Sector</th>
+                                <th>Growth Outlook (2023-2025)</th>
+                                <th>Key Trends</th>
+                                <th>Strategic Considerations</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Financial Services</td>
+                                <td>Very Strong (15-20% CAGR)</td>
+                                <td>Digital banking expansion, embedded finance, cross-border payments integration</td>
+                                <td>Balance customer acquisition with risk management; focus on unit economics</td>
+                            </tr>
+                            <tr>
+                                <td>Healthcare</td>
+                                <td>Strong (12-15% CAGR)</td>
+                                <td>Telemedicine adoption, pharmaceutical manufacturing expansion, insurance innovation</td>
+                                <td>Develop multi-tier service models; public-private partnership approaches</td>
+                            </tr>
+                            <tr>
+                                <td>Agriculture</td>
+                                <td>Moderate-Strong (8-12% CAGR)</td>
+                                <td>Technology adoption, value-added processing, climate adaptation solutions</td>
+                                <td>Integrated value chain approaches; smallholder inclusion strategies</td>
+                            </tr>
+                            <tr>
+                                <td>Renewable Energy</td>
+                                <td>Very Strong (18-25% CAGR)</td>
+                                <td>Distributed solutions, green hydrogen initiatives, utility-scale solar expansion</td>
+                                <td>Regulatory engagement critical; innovative financing solutions needed</td>
+                            </tr>
+                            <tr>
+                                <td>Consumer Retail</td>
+                                <td>Moderate (6-10% CAGR)</td>
+                                <td>Omnichannel expansion, quick commerce models, localized product development</td>
+                                <td>Last-mile logistics optimization; payment flexibility; city-specific strategies</td>
+                            </tr>
+                            <tr>
+                                <td>Digital Infrastructure</td>
+                                <td>Strong (10-15% CAGR)</td>
+                                <td>Data center expansion, fiber network development, 5G deployment in urban centers</td>
+                                <td>Infrastructure sharing models; edge computing for regional coverage</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Sources/References -->
+    <section id="sources" class="py-16 bg-gray-800 text-white">
+        <div class="container mx-auto px-4">
+            <h2 class="section-title text-3xl font-bold text-white mb-8">Sources & References</h2>
+            
+            <div class="bg-gray-700 p-6 rounded-lg">
+                <ol class="space-y-3 references">
+                    <li>[1] African Development Bank. (2023). African Economic Outlook 2023. Abidjan: AfDB Publications.</li>
+                    <li>[2] United Nations Economic Commission for Africa. (2023). Economic Report on Africa 2023: Leveraging the AfCFTA for Africa's Recovery. Addis Ababa: UNECA.</li>
+                    <li>[3] International Trade Centre. (2022). Africa E-Commerce Development Report. Geneva: ITC.</li>
+                    <li>[4] McKinsey Global Institute. (2023). Africa's Economic Transformation: Trends and Opportunities. New York: McKinsey & Company.</li>
+                    <li>[5] Partech Africa. (2023). 2022 Africa Tech Venture Capital Report. San Francisco: Partech Partners.</li>
+                    <li>[6] Briter Bridges. (2023). Africa Agritech Investment Report 2022. London: Briter Intelligence.</li>
+                    <li>[7] World Health Organization. (2023). The State of Health in Africa Report. Geneva: WHO Publications.</li>
+                    <li>[8] International Renewable Energy Agency. (2023). Renewable Capacity Statistics 2023. Abu Dhabi: IRENA.</li>
+                    <li>[9] GSMA. (2023). State of the Industry Report on Mobile Money 2023. London: GSMA.</li>
+                    <li>[10] Deloitte. (2022). The Future of Consumer Markets in Africa. Johannesburg: Deloitte Africa.</li>
+                    <li>[11] World Bank. (2023). Africa's Pulse, Volume 27. Washington D.C.: World Bank Group.</li>
+                    <li>[12] Infrastructure Consortium for Africa. (2022). Infrastructure Financing Trends in Africa – 2021. Abidjan: ICA.</li>
+                    <li>[13] International Crisis Group. (2023). Political Transitions in Africa: Trends and Challenges. Brussels: ICG.</li>
+                    <li>[14] United Nations Environment Programme. (2023). Adaptation Gap Report 2023. Nairobi: UNEP.</li>
+                    <li>[15] African Development Bank. (2023). Africa Skills Survey and Outlook. Abidjan: AfDB.</li>
+                    <li>[16] International Finance Corporation. (2022). MSME Finance Gap in Africa Update. Washington D.C.: IFC.</li>
+                    <li>[17] African Export-Import Bank. (2023). African Trade Report 2023. Cairo: Afreximbank.</li>
+                    <li>[18] Boston Consulting Group. (2023). African Consumer Sentiment Survey 2023. Boston: BCG.</li>
+                    <li>[19] Alliance for a Green Revolution in Africa. (2023). Africa Agriculture Status Report 2023. Nairobi: AGRA.</li>
+                    <li>[20] McKinsey & Company. (2022). The Future of Healthcare in Africa. New York: McKinsey & Company.</li>
+                    <li>[21] BFA Global. (2023). State of Fintech in Africa Report. Nairobi: BFA Global.</li>
+                    <li>[22] BloombergNEF. (2023). Energy Transition Investment Trends 2023. New York: Bloomberg Finance L.P.</li>
+                    <li>[23] HolonIQ. (2023). Africa EdTech Market Report. Sydney: HolonIQ.</li>
+                    <li>[24] World Economic Forum. (2022). Circular Economy in Africa: Opportunities for Building Resilience. Geneva: WEF.</li>
+                    <li>[25] United Nations Conference on Trade and Development. (2023). World Investment Report 2023. Geneva: UNCTAD.</li>
+                    <li>[26] Brookings Institution. (2023). Foresight Africa: Top Priorities for the Continent 2023-2033. Washington D.C.: Brookings.</li>
+                    <li>[27] Africa Venture Capital Association. (2023). 2022 Annual African Private Equity Data Tracker. London: AVCA.</li>
+                    <li>[28] International Institute for Strategic Studies. (2023). Strategic Survey 2023: The Annual Assessment of Geopolitics. London: IISS.</li>
+                    <li>[29] Johns Hopkins School of Advanced International Studies. (2023). China-Africa Research Initiative Database. Washington D.C.: SAIS-CARI.</li>
+                    <li>[30] Center for Strategic and International Studies. (2023). Western Engagement in Africa. Washington D.C.: CSIS.</li>
+                    <li>[31] Middle East Institute. (2023). Gulf States in Africa: Investment Trends and Geopolitical Implications. Washington D.C.: MEI.</li>
+                    <li>[32] Carnegie Endowment for International Peace. (2023). Russia's Evolving Strategy in Africa. Washington D.C.: Carnegie.</li>
+                    <li>[33] African Union. (2023). AfCFTA Implementation Progress Report. Addis Ababa: African Union Commission.</li>
+                    <li>[34] Institute for Security Studies. (2023). African Security Review. Pretoria: ISS.</li>
+                    <li>[35] World Economic Forum. (2023). Regional Strategy for Africa. Geneva: WEF.</li>
+                    <li>[36] Harvard Business Review. (2022). "Winning in Africa's Consumer Market." Harvard Business Review, May-June 2022.</li>
+                    <li>[37] Bain & Company. (2023). The Future of Digital Infrastructure in Africa. Boston: Bain & Company.</li>
+                    <li>[38] Global Center on Adaptation. (2023). State and Trends in Adaptation Report 2023. Rotterdam: GCA.</li>
+                    <li>[39] Stanford Graduate School of Business. (2022). "Ecosystem-Based Business Models in African Markets." Stanford Social Innovation Review, Fall 2022.</li>
+                    <li>[40] PwC. (2023). Africa Business Agenda 2023. Johannesburg: PricewaterhouseCoopers.</li>
+                </ol>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white py-8">
+        <div class="container mx-auto px-4">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <div class="mb-4 md:mb-0">
+                    <h3 class="text-lg font-bold">African Market Analysis 2025</h3>
+                    <p class="text-gray-400">Comprehensive insights for strategic decision-making</p>
+                </div>
+                
+                <div class="flex flex-col md:flex-row md:space-x-6 text-center md:text-left">
+                    <a href="#executive-summary" class="text-gray-400 hover:text-white mb-2 md:mb-0">Executive Summary</a>
+                    <a href="#market-landscape" class="text-gray-400 hover:text-white mb-2 md:mb-0">Market Landscape</a>
+                    <a href="#challenges" class="text-gray-400 hover:text-white mb-2 md:mb-0">Challenges</a>
+                    <a href="#opportunities" class="text-gray-400 hover:text-white mb-2 md:mb-0">Opportunities</a>
+                    <a href="#investment" class="text-gray-400 hover:text-white mb-2 md:mb-0">Investment</a>
+                </div>
+            </div>
+            
+            <div class="mt-8 pt-8 border-t border-gray-800 text-center text-gray-500 text-sm">
+                <p>© 2023 African Market Analysis Report. All rights reserved.</p>
+                <p class="mt-2">This report is for informational purposes only and should not be considered as financial or investment advice.</p>
+            </div>
+        </div>
+    </footer>
+    
+    <!-- Back to Top Button -->
+    <div class="back-to-top" id="backToTop">
+        <i class="fas fa-arrow-up"></i>
+    </div>
+    
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.7.1/dist/chart.min.js"></script>
+    <script>
+        // Mobile Menu Toggle
+        document.getElementById('mobile-menu-button').addEventListener('click', function() {
+            document.getElementById('main-nav').classList.toggle('show');
+        });
+        
+        // Back to Top Button
+        window.addEventListener('scroll', function() {
+            var backToTopButton = document.getElementById('backToTop');
+            if (window.pageYOffset > 300) {
+                backToTopButton.style.opacity = '1';
+            } else {
+                backToTopButton.style.opacity = '0';
+            }
+        });
+        
+        document.getElementById('backToTop').addEventListener('click', function() {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        });
+        
+        // Chart for FDI Inflows by Sector
+        window.addEventListener('load', function() {
+            var ctx = document.getElementById('sectorChart').getContext('2d');
+            var sectorChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Technology', 'Energy', 'Financial Services', 'Consumer Goods', 'Infrastructure', 'Agriculture', 'Mining'],
+                    datasets: [{
+                        label: 'FDI Inflows ($ Billions)',
+                        data: [12.5, 16.8, 9.3, 7.6, 14.2, 5.8, 16.8],
+                        backgroundColor: [
+                            'rgba(54, 162, 235, 0.7)',
+                            'rgba(255, 206, 86, 0.7)',
+                            'rgba(75, 192, 192, 0.7)',
+                            'rgba(153, 102, 255, 0.7)',
+                            'rgba(255, 159, 64, 0.7)',
+                            'rgba(46, 204, 113, 0.7)',
+                            'rgba(231, 76, 60, 0.7)'
+                        ],
+                        borderColor: [
+                            'rgba(54, 162, 235, 1)',
+                            'rgba(255, 206, 86, 1)',
+                            'rgba(75, 192, 192, 1)',
+                            'rgba(153, 102, 255, 1)',
+                            'rgba(255, 159, 64, 1)',
+                            'rgba(46, 204, 113, 1)',
+                            'rgba(231, 76, 60, 1)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'USD Billions'
+                            }
+                        }
+                    },
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'FDI Inflows by Sector (2022-2023)',
+                            font: {
+                                size: 16
+                            }
+                        },
+                        legend: {
+                            display: false
+                        }
+                    }
+                }
+            });
+        });
+        
+        // Smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+                // Close mobile menu if open
+                document.getElementById('main-nav').classList.remove('show');
+            });
+        });
+    </script>
+</body>
+</html>

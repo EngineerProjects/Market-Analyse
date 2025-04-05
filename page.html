@@ -1,0 +1,1508 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Market Analysis 2025</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.0.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            color: #333;
+            line-height: 1.6;
+            background-color: #f8f9fa;
+        }
+        .gradient-bg {
+            background: linear-gradient(120deg, #4338ca, #3b82f6);
+        }
+        .card {
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+        .section-title {
+            position: relative;
+            margin-bottom: 2rem;
+        }
+        .section-title:after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 0;
+            width: 60px;
+            height: 4px;
+            background: linear-gradient(90deg, #4338ca, #3b82f6);
+        }
+        .chart-container {
+            height: 300px;
+            position: relative;
+        }
+        .stat-card {
+            background: white;
+            border-radius: 8px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+        }
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+        }
+        .sector-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        th {
+            background-color: #f1f5f9;
+            font-weight: 600;
+        }
+        tr:hover {
+            background-color: #f8fafc;
+        }
+        .leader-card {
+            transition: transform 0.3s ease;
+        }
+        .leader-card:hover {
+            transform: translateY(-5px);
+        }
+        .timeline {
+            position: relative;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .timeline::after {
+            content: '';
+            position: absolute;
+            width: 6px;
+            background-color: #e2e8f0;
+            top: 0;
+            bottom: 0;
+            left: 50%;
+            margin-left: -3px;
+        }
+        .container-timeline {
+            padding: 10px 40px;
+            position: relative;
+            background-color: inherit;
+            width: 50%;
+        }
+        .container-timeline::after {
+            content: '';
+            position: absolute;
+            width: 25px;
+            height: 25px;
+            right: -12px;
+            background-color: white;
+            border: 4px solid #3b82f6;
+            top: 15px;
+            border-radius: 50%;
+            z-index: 1;
+        }
+        .left {
+            left: 0;
+        }
+        .right {
+            left: 50%;
+        }
+        .left::before {
+            content: " ";
+            height: 0;
+            position: absolute;
+            top: 22px;
+            width: 0;
+            z-index: 1;
+            right: 30px;
+            border: medium solid #e2e8f0;
+            border-width: 10px 0 10px 10px;
+            border-color: transparent transparent transparent #e2e8f0;
+        }
+        .right::before {
+            content: " ";
+            height: 0;
+            position: absolute;
+            top: 22px;
+            width: 0;
+            z-index: 1;
+            left: 30px;
+            border: medium solid #e2e8f0;
+            border-width: 10px 10px 10px 0;
+            border-color: transparent #e2e8f0 transparent transparent;
+        }
+        .right::after {
+            left: -13px;
+        }
+        .content {
+            padding: 20px 30px;
+            background-color: white;
+            position: relative;
+            border-radius: 6px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+        .challenge-card {
+            border-left: 4px solid #3b82f6;
+        }
+        @media print {
+            .page-break {
+                page-break-after: always;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="gradient-bg text-white shadow-lg">
+        <div class="container mx-auto px-6 py-10">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <div>
+                    <h1 class="text-4xl md:text-5xl font-bold">The State of AI</h1>
+                    <h2 class="text-2xl md:text-3xl font-light mt-2">Market Analysis 2025</h2>
+                </div>
+                <nav class="mt-6 md:mt-0">
+                    <ul class="flex space-x-6">
+                        <li><a href="#market" class="hover:text-blue-200 transition">Market Size</a></li>
+                        <li><a href="#trends" class="hover:text-blue-200 transition">Trends</a></li>
+                        <li><a href="#challenges" class="hover:text-blue-200 transition">Challenges</a></li>
+                        <li><a href="#leaders" class="hover:text-blue-200 transition">Leaders</a></li>
+                        <li><a href="#sectors" class="hover:text-blue-200 transition">Sectors</a></li>
+                        <li><a href="#regulation" class="hover:text-blue-200 transition">Regulation</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="bg-white py-16">
+        <div class="container mx-auto px-6">
+            <div class="flex flex-col md:flex-row items-center">
+                <div class="md:w-1/2 md:pr-10">
+                    <h2 class="text-4xl font-bold mb-6">Artificial Intelligence: Reshaping Industries in 2025</h2>
+                    <p class="text-lg text-gray-600 mb-8">The global AI market is experiencing unprecedented growth, reaching $757.58 billion in 2025 and projected to expand to $3,680.47 billion by 2034, transforming how businesses operate across all sectors.</p>
+                    <div class="flex flex-wrap gap-6">
+                        <div class="stat-card w-full sm:w-64">
+                            <h3 class="text-gray-500 text-sm font-semibold">MARKET SIZE 2025</h3>
+                            <p class="text-4xl font-bold text-blue-600">$757.58B</p>
+                            <p class="text-gray-600 mt-2">19.20% CAGR (2025-2034)</p>
+                        </div>
+                        <div class="stat-card w-full sm:w-64">
+                            <h3 class="text-gray-500 text-sm font-semibold">PROJECTED BY 2034</h3>
+                            <p class="text-4xl font-bold text-indigo-600">$3.68T</p>
+                            <p class="text-gray-600 mt-2">4.8x increase from 2025</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="md:w-1/2 mt-10 md:mt-0">
+                    <div class="bg-gray-100 p-8 rounded-lg shadow-inner">
+                        <h3 class="text-xl font-semibold mb-4">Key Market Insights</h3>
+                        <ul class="space-y-3">
+                            <li class="flex items-start">
+                                <span class="text-blue-500 mr-2"><i class="fas fa-check-circle mt-1"></i></span>
+                                <span>78% of organizations now use AI in at least one business function, up from 72% in previous years</span>
+                            </li>
+                            <li class="flex items-start">
+                                <span class="text-blue-500 mr-2"><i class="fas fa-check-circle mt-1"></i></span>
+                                <span>By 2025, as many as 97 million people will work in the AI space globally</span>
+                            </li>
+                            <li class="flex items-start">
+                                <span class="text-blue-500 mr-2"><i class="fas fa-check-circle mt-1"></i></span>
+                                <span>Tech megacaps to spend more than $300 billion in 2025 to advance AI technologies</span>
+                            </li>
+                            <li class="flex items-start">
+                                <span class="text-blue-500 mr-2"><i class="fas fa-check-circle mt-1"></i></span>
+                                <span>AI could affect 40% of jobs worldwide, reshaping labor markets across industries</span>
+                            </li>
+                            <li class="flex items-start">
+                                <span class="text-blue-500 mr-2"><i class="fas fa-check-circle mt-1"></i></span>
+                                <span>92% of executives plan to boost AI spending in the next three years</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Executive Summary -->
+    <section class="py-12 bg-gray-50">
+        <div class="container mx-auto px-6">
+            <h2 class="text-3xl font-bold mb-8 text-center">Executive Summary</h2>
+            <div class="bg-white rounded-lg shadow-md p-8">
+                <p class="text-lg leading-relaxed mb-6">
+                    The artificial intelligence market in 2025 stands at a pivotal inflection point, characterized by rapid technological advancement, expanding adoption across industries, and evolving regulatory frameworks. With a market size of $757.58 billion and a projected compound annual growth rate (CAGR) of 19.20% through 2034, AI has transcended its experimental phase to become a fundamental driver of business transformation.
+                </p>
+                <p class="text-lg leading-relaxed mb-6">
+                    Key trends shaping the AI landscape in 2025 include the rise of AI reasoning capabilities, multimodal AI systems that process diverse data types, specialized AI models tailored for specific industries, and a shift toward AI agents with increased autonomy. Meanwhile, challenges around data quality, bias, energy consumption, regulatory compliance, and cybersecurity remain significant concerns for organizations implementing AI solutions.
+                </p>
+                <p class="text-lg leading-relaxed">
+                    This comprehensive analysis explores the current state of the AI market in 2025, examines sector-specific applications across healthcare, finance, manufacturing, retail, and energy, identifies key industry leaders, and assesses the evolving regulatory landscape that aims to balance innovation with ethical considerations and consumer protection.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Market Size and Growth -->
+    <section id="market" class="py-16 bg-white">
+        <div class="container mx-auto px-6">
+            <h2 class="section-title text-3xl font-bold">Market Size and Growth</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
+                <div>
+                    <h3 class="text-2xl font-semibold mb-4">Global AI Market Landscape</h3>
+                    <p class="text-gray-700 mb-6">
+                        The global artificial intelligence market has experienced exceptional growth, reaching $757.58 billion in 2025. This represents a significant increase from $638.23 billion in 2024, demonstrating the accelerating pace of AI adoption worldwide.
+                    </p>
+                    <p class="text-gray-700 mb-6">
+                        According to Precedence Research, the AI market is forecasted to reach around $3,680.47 billion by 2034, growing at a compound annual growth rate (CAGR) of 19.20% from 2025 to 2034. This exceptional growth trajectory is driven by widespread adoption across industries, advancements in computing power, and increasing availability of large datasets.
+                    </p>
+                    <p class="text-gray-700">
+                        The United Nations reports that AI is on course to become a $4.8 trillion global market by 2033—roughly the size of Germany's economy—highlighting the transformative economic potential of artificial intelligence technologies.
+                    </p>
+                    
+                    <div class="mt-8 bg-blue-50 p-6 rounded-lg">
+                        <h4 class="text-xl font-semibold mb-3">Key Growth Drivers</h4>
+                        <ul class="space-y-2">
+                            <li class="flex items-start">
+                                <span class="text-blue-500 mr-2"><i class="fas fa-arrow-trend-up mt-1"></i></span>
+                                <span>Increasing enterprise adoption across all sectors</span>
+                            </li>
+                            <li class="flex items-start">
+                                <span class="text-blue-500 mr-2"><i class="fas fa-arrow-trend-up mt-1"></i></span>
+                                <span>Advancements in model capabilities and performance</span>
+                            </li>
+                            <li class="flex items-start">
+                                <span class="text-blue-500 mr-2"><i class="fas fa-arrow-trend-up mt-1"></i></span>
+                                <span>Growing investment in AI infrastructure and research</span>
+                            </li>
+                            <li class="flex items-start">
+                                <span class="text-blue-500 mr-2"><i class="fas fa-arrow-trend-up mt-1"></i></span>
+                                <span>Consumer demand for AI-powered products and services</span>
+                            </li>
+                            <li class="flex items-start">
+                                <span class="text-blue-500 mr-2"><i class="fas fa-arrow-trend-up mt-1"></i></span>
+                                <span>Integration of AI with IoT, cloud computing, and edge devices</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <div>
+                    <div class="bg-gray-50 p-6 rounded-lg shadow mb-8">
+                        <h3 class="text-xl font-semibold mb-4">AI Market Size by Region (2025)</h3>
+                        <div class="space-y-4">
+                            <div>
+                                <div class="flex justify-between mb-1">
+                                    <span class="font-medium">North America</span>
+                                    <span class="font-medium">42%</span>
+                                </div>
+                                <div class="w-full bg-gray-200 rounded-full h-2.5">
+                                    <div class="bg-blue-600 h-2.5 rounded-full" style="width: 42%"></div>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="flex justify-between mb-1">
+                                    <span class="font-medium">Europe</span>
+                                    <span class="font-medium">24%</span>
+                                </div>
+                                <div class="w-full bg-gray-200 rounded-full h-2.5">
+                                    <div class="bg-blue-600 h-2.5 rounded-full" style="width: 24%"></div>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="flex justify-between mb-1">
+                                    <span class="font-medium">Asia-Pacific</span>
+                                    <span class="font-medium">28%</span>
+                                </div>
+                                <div class="w-full bg-gray-200 rounded-full h-2.5">
+                                    <div class="bg-blue-600 h-2.5 rounded-full" style="width: 28%"></div>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="flex justify-between mb-1">
+                                    <span class="font-medium">Rest of World</span>
+                                    <span class="font-medium">6%</span>
+                                </div>
+                                <div class="w-full bg-gray-200 rounded-full h-2.5">
+                                    <div class="bg-blue-600 h-2.5 rounded-full" style="width: 6%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-gray-50 p-6 rounded-lg shadow">
+                        <h3 class="text-xl font-semibold mb-4">Investment Trends</h3>
+                        <p class="text-gray-700 mb-4">
+                            Tech megacaps, including Meta, Amazon, Alphabet, and Microsoft, are projected to spend as much as $320 billion combined on AI technologies and datacenter buildouts in 2025, highlighting the fierce competition to dominate the AI landscape.
+                        </p>
+                        <p class="text-gray-700 mb-4">
+                            According to EY research, 97% of senior business leaders plan to maintain or increase their AI investments in 2025, despite growing recognition of potential risks. This underscores the strategic importance businesses place on AI capabilities.
+                        </p>
+                        <p class="text-gray-700">
+                            Morgan Stanley Research estimates that AI-driven productivity could add 30 basis points to 2025 net margins for members of the S&P 500, driving continued investment in AI technologies across sectors.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Key AI Trends -->
+    <section id="trends" class="py-16 bg-gray-50">
+        <div class="container mx-auto px-6">
+            <h2 class="section-title text-3xl font-bold">Key AI Trends for 2025</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mt-10">
+                <div class="card bg-white rounded-lg shadow-md p-6">
+                    <div class="text-blue-500 mb-4">
+                        <i class="fas fa-brain text-4xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-3">AI Reasoning & Intelligence</h3>
+                    <p class="text-gray-600 mb-4">
+                        AI systems in 2025 are developing enhanced reasoning capabilities that allow them to solve complex problems, understand context, and make more nuanced decisions. This evolution from pattern recognition to logical reasoning represents a significant advancement in AI technology.
+                    </p>
+                    <p class="text-gray-600">
+                        Industry leaders like Google, Microsoft, and Anthropic are developing frontier models that demonstrate improved logical reasoning, planning abilities, and causal understanding.
+                    </p>
+                </div>
+                
+                <div class="card bg-white rounded-lg shadow-md p-6">
+                    <div class="text-blue-500 mb-4">
+                        <i class="fas fa-robot text-4xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-3">AI Agents & Autonomy</h3>
+                    <p class="text-gray-600 mb-4">
+                        AI agents are emerging as a major trend in 2025, with systems capable of acting autonomously to accomplish complex tasks. These agents can navigate interfaces, make decisions, and execute multi-step processes with limited human intervention.
+                    </p>
+                    <p class="text-gray-600">
+                        According to Salesforce research, 75% of retailers believe AI agents will be essential to compete in the market by the end of 2025, highlighting the growing importance of this technology.
+                    </p>
+                </div>
+                
+                <div class="card bg-white rounded-lg shadow-md p-6">
+                    <div class="text-blue-500 mb-4">
+                        <i class="fas fa-layer-group text-4xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-3">Multimodal AI</h3>
+                    <p class="text-gray-600 mb-4">
+                        Multimodal AI systems that can process and understand multiple types of data—text, images, audio, video—simultaneously are becoming standard in 2025. These systems provide richer context and more comprehensive understanding than single-modality models.
+                    </p>
+                    <p class="text-gray-600">
+                        Google Cloud identifies multimodal AI as a top trend for 2025, particularly for government and financial services sectors, where contextual understanding is crucial for decision-making.
+                    </p>
+                </div>
+                
+                <div class="card bg-white rounded-lg shadow-md p-6">
+                    <div class="text-blue-500 mb-4">
+                        <i class="fas fa-microchip text-4xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-3">Custom Silicon & Edge AI</h3>
+                    <p class="text-gray-600 mb-4">
+                        The development of specialized AI chips and processors is accelerating in 2025, with companies designing custom silicon to optimize AI performance while reducing power consumption. This trend is enabling more AI processing to occur on edge devices rather than in centralized data centers.
+                    </p>
+                    <p class="text-gray-600">
+                        Morgan Stanley highlights custom silicon as a key driver of innovation in 2025, with demand for specialized AI chips contributing to the semiconductor industry's growth.
+                    </p>
+                </div>
+                
+                <div class="card bg-white rounded-lg shadow-md p-6">
+                    <div class="text-blue-500 mb-4">
+                        <i class="fas fa-code-branch text-4xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-3">Small & Specialized Models</h3>
+                    <p class="text-gray-600 mb-4">
+                        While large language models remain important, 2025 is seeing a rise in smaller, more efficient, and domain-specific AI models. These specialized models require less computing power, produce faster results, and excel at specific tasks within industries.
+                    </p>
+                    <p class="text-gray-600">
+                        MIT Technology Review notes that small language models (SLMs) are one of the hottest AI trends of 2025, as organizations seek more cost-effective and efficient AI solutions.
+                    </p>
+                </div>
+                
+                <div class="card bg-white rounded-lg shadow-md p-6">
+                    <div class="text-blue-500 mb-4">
+                        <i class="fas fa-shield-alt text-4xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-3">Responsible AI & Governance</h3>
+                    <p class="text-gray-600 mb-4">
+                        As AI adoption accelerates, responsible AI practices and governance frameworks are becoming business imperatives in 2025. Organizations are implementing robust systems to ensure fairness, transparency, accountability, and ethical use of AI technologies.
+                    </p>
+                    <p class="text-gray-600">
+                        According to IBM insights, AI ethics and governance have become top priorities for business leaders in 2025, with increasing focus on addressing issues such as hallucination, bias, and risk management.
+                    </p>
+                </div>
+            </div>
+            
+            <div class="mt-12 bg-white rounded-lg shadow-md p-8">
+                <h3 class="text-2xl font-semibold mb-6">Emerging Trends to Watch</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div>
+                        <h4 class="flex items-center text-lg font-medium mb-3">
+                            <span class="text-blue-500 mr-2"><i class="fas fa-lightbulb"></i></span>
+                            Hyper-Personalization
+                        </h4>
+                        <p class="text-gray-600 ml-7">
+                            AI systems are delivering unprecedented levels of personalization across industries, from healthcare treatments tailored to individual genetic profiles to retail experiences that anticipate customer needs with remarkable accuracy.
+                        </p>
+                    </div>
+                    
+                    <div>
+                        <h4 class="flex items-center text-lg font-medium mb-3">
+                            <span class="text-blue-500 mr-2"><i class="fas fa-lightbulb"></i></span>
+                            Decision Intelligence
+                        </h4>
+                        <p class="text-gray-600 ml-7">
+                            The integration of AI with decision-making processes is creating "decision intelligence" systems that augment human judgment with data-driven insights, improving outcomes across business operations.
+                        </p>
+                    </div>
+                    
+                    <div>
+                        <h4 class="flex items-center text-lg font-medium mb-3">
+                            <span class="text-blue-500 mr-2"><i class="fas fa-lightbulb"></i></span>
+                            AI for Sustainability
+                        </h4>
+                        <p class="text-gray-600 ml-7">
+                            AI applications focused on environmental sustainability are gaining traction, with systems optimizing energy usage, reducing waste, and supporting climate change mitigation efforts across industries.
+                        </p>
+                    </div>
+                    
+                    <div>
+                        <h4 class="flex items-center text-lg font-medium mb-3">
+                            <span class="text-blue-500 mr-2"><i class="fas fa-lightbulb"></i></span>
+                            Spatial Intelligence
+                        </h4>
+                        <p class="text-gray-600 ml-7">
+                            AI systems with improved 3D understanding and spatial reasoning capabilities are enabling advancements in augmented reality, autonomous navigation, and virtual environment creation.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Challenges and Ethical Considerations -->
+    <section id="challenges" class="py-16 bg-white">
+        <div class="container mx-auto px-6">
+            <h2 class="section-title text-3xl font-bold">Challenges and Ethical Considerations</h2>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 mt-10">
+                <div>
+                    <div class="challenge-card bg-white rounded-lg shadow-md p-6 mb-8">
+                        <h3 class="text-xl font-semibold mb-4">Data Quality and Bias</h3>
+                        <p class="text-gray-700 mb-4">
+                            Data quality remains a significant challenge for AI implementation in 2025. According to IBM's research, 45% of organizations cite concerns about data accuracy or bias as their top AI adoption challenge. Biased training data can lead to discriminatory outcomes, particularly in high-stakes domains like healthcare, finance, and criminal justice.
+                        </p>
+                        <p class="text-gray-700">
+                            Companies are investing in rigorous data governance frameworks and bias detection tools, but addressing these issues at scale remains difficult as AI systems become more complex and pervasive across industries.
+                        </p>
+                    </div>
+                    
+                    <div class="challenge-card bg-white rounded-lg shadow-md p-6 mb-8">
+                        <h3 class="text-xl font-semibold mb-4">AI Energy Consumption</h3>
+                        <p class="text-gray-700 mb-4">
+                            The energy requirements of AI systems present both environmental and practical challenges. According to the World Economic Forum, AI-related electricity consumption is expected to grow by as much as 50% annually from 2023 to 2030, posing significant challenges to power systems.
+                        </p>
+                        <p class="text-gray-700">
+                            MIT research highlights how providing electricity to power-hungry data centers is stressing grids, raising prices for consumers, and potentially slowing the transition to clean energy. This challenge is driving innovation in energy-efficient AI hardware and algorithms.
+                        </p>
+                    </div>
+                    
+                    <div class="challenge-card bg-white rounded-lg shadow-md p-6">
+                        <h3 class="text-xl font-semibold mb-4">Cybersecurity Risks</h3>
+                        <p class="text-gray-700 mb-4">
+                            As AI systems become more integrated into critical infrastructure, they present new cybersecurity vulnerabilities. IBM's 2025 cybersecurity predictions highlight the emerging threat of "shadow AI" – unsanctioned AI models used by staff without proper governance.
+                        </p>
+                        <p class="text-gray-700">
+                            The World Economic Forum reports that generative AI is augmenting cybercriminal capabilities, with 72% of respondents reporting an uptick in social engineering attacks. AI-driven malware that can mutate in real-time to avoid detection represents a particularly concerning trend.
+                        </p>
+                    </div>
+                </div>
+                
+                <div>
+                    <div class="challenge-card bg-white rounded-lg shadow-md p-6 mb-8">
+                        <h3 class="text-xl font-semibold mb-4">Job Market Disruption</h3>
+                        <p class="text-gray-700 mb-4">
+                            The impact of AI on employment continues to be a major concern in 2025. The UN warns that AI could affect 40% of jobs worldwide, potentially widening inequality between nations. The U.S. Bureau of Labor Statistics reports that AI is expected to primarily affect occupations whose core tasks can be most easily replicated by current technology.
+                        </p>
+                        <p class="text-gray-700">
+                            However, the World Economic Forum's Future of Jobs Report 2025 offers a more balanced perspective, indicating that about 170 million new jobs will be created this decade, many related to AI development and implementation.
+                        </p>
+                    </div>
+                    
+                    <div class="challenge-card bg-white rounded-lg shadow-md p-6 mb-8">
+                        <h3 class="text-xl font-semibold mb-4">Regulatory Compliance</h3>
+                        <p class="text-gray-700 mb-4">
+                            Navigating the evolving regulatory landscape presents significant challenges for organizations implementing AI. By 2025, companies are facing a complex patchwork of regulations across different jurisdictions, with the EU's AI Act being particularly influential.
+                        </p>
+                        <p class="text-gray-700">
+                            According to Stibble's analysis, by May 2, 2025, providers of AI systems need to have their codes of practice ready to demonstrate compliance with the EU AI Act's requirements, creating substantial operational challenges for global organizations.
+                        </p>
+                    </div>
+                    
+                    <div class="challenge-card bg-white rounded-lg shadow-md p-6">
+                        <h3 class="text-xl font-semibold mb-4">Ethical Dilemmas</h3>
+                        <p class="text-gray-700 mb-6">
+                            Ethical considerations around AI continue to evolve in 2025, with three key areas of concern identified by experts:
+                        </p>
+                        <div class="space-y-4 ml-4">
+                            <div>
+                                <h5 class="font-semibold text-gray-800">Transparency</h5>
+                                <p class="text-gray-600">The "black box" nature of complex AI systems makes it difficult to understand how decisions are made, raising concerns about accountability and trust.</p>
+                            </div>
+                            <div>
+                                <h5 class="font-semibold text-gray-800">Privacy</h5>
+                                <p class="text-gray-600">AI systems' data requirements create tensions with privacy rights, particularly as models become more sophisticated in processing personal information.</p>
+                            </div>
+                            <div>
+                                <h5 class="font-semibold text-gray-800">Autonomy</h5>
+                                <p class="text-gray-600">As AI agents gain more decision-making capabilities, questions arise about appropriate levels of human oversight and the boundaries of machine autonomy.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Industry Leaders -->
+    <section id="leaders" class="py-16 bg-gray-50">
+        <div class="container mx-auto px-6">
+            <h2 class="section-title text-3xl font-bold">AI Industry Leaders in 2025</h2>
+            <p class="text-gray-600 text-lg mb-10">
+                The competitive landscape for AI is intensifying in 2025, with established tech giants and innovative startups vying for market share across different segments of the AI value chain.
+            </p>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div class="leader-card bg-white rounded-lg shadow-md overflow-hidden">
+                    <div class="p-6">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-xl font-bold">NVIDIA</h3>
+                            <span class="text-sm bg-blue-100 text-blue-800 py-1 px-3 rounded-full">Semiconductors</span>
+                        </div>
+                        <p class="text-gray-600 mb-4">
+                            Dominant in AI hardware, NVIDIA continues to lead the market for specialized AI chips and GPUs in 2025. Their AI infrastructure powers everything from cloud computing to autonomous vehicles, making them fundamental to the AI ecosystem.
+                        </p>
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm text-gray-500">Market Cap: $2.9T</span>
+                            <span class="text-green-600 font-medium flex items-center">
+                                <i class="fas fa-arrow-up mr-1"></i> 28% YoY Growth
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="leader-card bg-white rounded-lg shadow-md overflow-hidden">
+                    <div class="p-6">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-xl font-bold">Microsoft</h3>
+                            <span class="text-sm bg-blue-100 text-blue-800 py-1 px-3 rounded-full">Cloud & Software</span>
+                        </div>
+                        <p class="text-gray-600 mb-4">
+                            Microsoft's strategic partnership with OpenAI and integration of AI across its product suite has cemented its position as a leader in enterprise AI solutions. Azure's AI capabilities and the company's productivity tools give it unparalleled reach.
+                        </p>
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm text-gray-500">Market Cap: $3.2T</span>
+                            <span class="text-green-600 font-medium flex items-center">
+                                <i class="fas fa-arrow-up mr-1"></i> 22% YoY Growth
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="leader-card bg-white rounded-lg shadow-md overflow-hidden">
+                    <div class="p-6">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-xl font-bold">Google (Alphabet)</h3>
+                            <span class="text-sm bg-blue-100 text-blue-800 py-1 px-3 rounded-full">AI Research</span>
+                        </div>
+                        <p class="text-gray-600 mb-4">
+                            Google remains at the forefront of AI research and development, with its Gemini models setting new benchmarks for AI capabilities. The company's extensive data assets and deep technical expertise continue to drive innovation across the AI spectrum.
+                        </p>
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm text-gray-500">Market Cap: $2.1T</span>
+                            <span class="text-green-600 font-medium flex items-center">
+                                <i class="fas fa-arrow-up mr-1"></i> 18% YoY Growth
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="leader-card bg-white rounded-lg shadow-md overflow-hidden">
+                    <div class="p-6">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-xl font-bold">Amazon</h3>
+                            <span class="text-sm bg-blue-100 text-blue-800 py-1 px-3 rounded-full">Cloud & Retail</span>
+                        </div>
+                        <p class="text-gray-600 mb-4">
+                            Amazon Web Services (AWS) provides AI infrastructure for countless organizations, while the company's retail operations showcase advanced AI applications in logistics, recommendation systems, and voice assistants.
+                        </p>
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm text-gray-500">Market Cap: $1.9T</span>
+                            <span class="text-green-600 font-medium flex items-center">
+                                <i class="fas fa-arrow-up mr-1"></i> 16% YoY Growth
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="leader-card bg-white rounded-lg shadow-md overflow-hidden">
+                    <div class="p-6">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-xl font-bold">OpenAI</h3>
+                            <span class="text-sm bg-blue-100 text-blue-800 py-1 px-3 rounded-full">AI Research</span>
+                        </div>
+                        <p class="text-gray-600 mb-4">
+                            Despite leadership transitions, OpenAI remains influential in 2025, with its models powering numerous applications across industries. The company continues to push boundaries in general-purpose AI systems while navigating complex governance challenges.
+                        </p>
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm text-gray-500">Valuation: $86B</span>
+                            <span class="text-green-600 font-medium flex items-center">
+                                <i class="fas fa-arrow-up mr-1"></i> 40% Growth in API Usage
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="leader-card bg-white rounded-lg shadow-md overflow-hidden">
+                    <div class="p-6">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-xl font-bold">Anthropic</h3>
+                            <span class="text-sm bg-blue-100 text-blue-800 py-1 px-3 rounded-full">AI Safety</span>
+                        </div>
+                        <p class="text-gray-600 mb-4">
+                            Known for its focus on AI safety and constitutional AI approach, Anthropic has emerged as a key player in the responsible AI movement. Its Claude models are recognized for their reliability and nuanced responses to complex queries.
+                        </p>
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm text-gray-500">Valuation: $35B</span>
+                            <span class="text-green-600 font-medium flex items-center">
+                                <i class="fas fa-arrow-up mr-1"></i> 75% Enterprise Adoption Growth
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mt-12">
+                <h3 class="text-2xl font-semibold mb-6">Emerging Players to Watch</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <div class="bg-white rounded-lg shadow-sm p-4">
+                        <h4 class="font-semibold">Cohere</h4>
+                        <p class="text-sm text-gray-600">Specializing in enterprise-focused language models with impressive performance on business tasks.</p>
+                    </div>
+                    <div class="bg-white rounded-lg shadow-sm p-4">
+                        <h4 class="font-semibold">Inflection AI</h4>
+                        <p class="text-sm text-gray-600">Building personal AI systems focused on human-like conversation and emotional intelligence.</p>
+                    </div>
+                    <div class="bg-white rounded-lg shadow-sm p-4">
+                        <h4 class="font-semibold">Stability AI</h4>
+                        <p class="text-sm text-gray-600">Leading in open-source generative models for images, video, and multimodal applications.</p>
+                    </div>
+                    <div class="bg-white rounded-lg shadow-sm p-4">
+                        <h4 class="font-semibold">Adept</h4>
+                        <p class="text-sm text-gray-600">Pioneering AI systems that can interact with software interfaces to automate complex workflows.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Sector-specific Applications -->
+    <section id="sectors" class="py-16 bg-white">
+        <div class="container mx-auto px-6">
+            <h2 class="section-title text-3xl font-bold">Sector-specific Applications</h2>
+            <p class="text-gray-600 text-lg mb-10">
+                AI is transforming industries across the global economy, with each sector developing specialized applications that address their unique challenges and opportunities.
+            </p>
+            
+            <div class="space-y-12">
+                <!-- Healthcare Section -->
+                <div class="bg-white rounded-lg shadow-md overflow-hidden">
+                    <div class="bg-blue-50 p-6">
+                        <div class="flex items-center">
+                            <div class="text-blue-500 mr-4">
+                                <i class="fas fa-heartbeat text-4xl"></i>
+                            </div>
+                            <h3 class="text-2xl font-bold">Healthcare</h3>
+                        </div>
+                    </div>
+                    <div class="p-6">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                            <div>
+                                <h4 class="text-xl font-semibold mb-4">Market Overview</h4>
+                                <p class="text-gray-700 mb-4">
+                                    The AI in healthcare market is projected to reach $613.81 billion by 2034, with 71% of healthcare industry leaders expecting improved profitability from AI implementations in 2025.
+                                </p>
+                                <p class="text-gray-700">
+                                    In the MENA region alone, the AI healthcare market is expected to reach $1.8 billion by 2029, growing at a remarkable 35.8% CAGR, indicating the global nature of healthcare AI adoption.
+                                </p>
+                                
+                                <h4 class="text-xl font-semibold mt-6 mb-4">Key Applications</h4>
+                                <ul class="space-y-3">
+                                    <li class="flex items-start">
+                                        <span class="text-blue-500 mr-2"><i class="fas fa-check-circle mt-1"></i></span>
+                                        <div>
+                                            <span class="font-medium">Diagnostic Imaging:</span>
+                                            <span class="text-gray-600"> AI tools that can detect abnormalities in medical images with accuracy matching or exceeding human radiologists.</span>
+                                        </div>
+                                    </li>
+                                    <li class="flex items-start">
+                                        <span class="text-blue-500 mr-2"><i class="fas fa-check-circle mt-1"></i></span>
+                                        <div>
+                                            <span class="font-medium">Drug Discovery:</span>
+                                            <span class="text-gray-600"> AI-powered systems accelerating the identification and development of new therapeutic compounds.</span>
+                                        </div>
+                                    </li>
+                                    <li class="flex items-start">
+                                        <span class="text-blue-500 mr-2"><i class="fas fa-check-circle mt-1"></i></span>
+                                        <div>
+                                            <span class="font-medium">Personalized Medicine:</span>
+                                            <span class="text-gray-600"> Treatment plans tailored to individual genetic profiles, medical history, and lifestyle factors.</span>
+                                        </div>
+                                    </li>
+                                    <li class="flex items-start">
+                                        <span class="text-blue-500 mr-2"><i class="fas fa-check-circle mt-1"></i></span>
+                                        <div>
+                                            <span class="font-medium">Predictive Analytics:</span>
+                                            <span class="text-gray-600"> Systems that can forecast patient deterioration and disease outbreaks before clinical signs appear.</span>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </div>
+                            
+                            <div>
+                                <h4 class="text-xl font-semibold mb-4">2025 Trends</h4>
+                                <div class="space-y-4">
+                                    <div class="bg-gray-50 p-4 rounded-lg">
+                                        <h5 class="font-medium text-gray-800">Agentic Medical Assistance</h5>
+                                        <p class="text-gray-600 mt-1">
+                                            AI agents that can assist healthcare providers by automating routine tasks, gathering patient information, and suggesting evidence-based treatment options.
+                                        </p>
+                                    </div>
+                                    <div class="bg-gray-50 p-4 rounded-lg">
+                                        <h5 class="font-medium text-gray-800">Intelligent Clinical Coding</h5>
+                                        <p class="text-gray-600 mt-1">
+                                            AI systems that automatically generate accurate medical codes from clinical documentation, improving billing accuracy and reducing administrative burden.
+                                        </p>
+                                    </div>
+                                    <div class="bg-gray-50 p-4 rounded-lg">
+                                        <h5 class="font-medium text-gray-800">Remote Patient Monitoring</h5>
+                                        <p class="text-gray-600 mt-1">
+                                            Advanced AI algorithms that can interpret data from wearable devices and home sensors to monitor patient health and detect early warning signs of deterioration.
+                                        </p>
+                                    </div>
+                                </div>
+                                
+                                <div class="mt-6 bg-blue-50 p-4 rounded-lg">
+                                    <h4 class="font-semibold mb-2">Impact Highlight</h4>
+                                    <p class="text-gray-700">
+                                        "In 2025, the adoption of AI in healthcare will advance significantly, bringing more sophisticated applications in predictive analytics, diagnostic assistance, and treatment optimization. AI is becoming an essential tool for addressing healthcare access challenges, with 4.5 billion people still lacking access to essential services globally."
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Financial Services Section -->
+                <div class="bg-white rounded-lg shadow-md overflow-hidden">
+                    <div class="bg-green-50 p-6">
+                        <div class="flex items-center">
+                            <div class="text-green-500 mr-4">
+                                <i class="fas fa-chart-line text-4xl"></i>
+                            </div>
+                            <h3 class="text-2xl font-bold">Financial Services</h3>
+                        </div>
+                    </div>
+                    <div class="p-6">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                            <div>
+                                <h4 class="text-xl font-semibold mb-4">Market Overview</h4>
+                                <p class="text-gray-700 mb-4">
+                                    Financial services firms invested $35 billion in AI during 2023, with projections showing continued growth across banking, insurance, capital markets, and payments sectors. In 2025, AI is becoming central to competitive strategy in finance.
+                                </p>
+                                <p class="text-gray-700">
+                                    According to an IBM study, generative AI is expected to significantly elevate the financial performance of banks in 2025, as initiatives mature from pilots to targeted enterprise-wide implementations.
+                                </p>
+                                
+                                <h4 class="text-xl font-semibold mt-6 mb-4">Key Applications</h4>
+                                <ul class="space-y-3">
+                                    <li class="flex items-start">
+                                        <span class="text-green-500 mr-2"><i class="fas fa-check-circle mt-1"></i></span>
+                                        <div>
+                                            <span class="font-medium">Fraud Detection:</span>
+                                            <span class="text-gray-600"> Real-time systems that can identify suspicious patterns and prevent fraudulent transactions before they're completed.</span>
+                                        </div>
+                                    </li>
+                                    <li class="flex items-start">
+                                        <span class="text-green-500 mr-2"><i class="fas fa-check-circle mt-1"></i></span>
+                                        <div>
+                                            <span class="font-medium">Algorithmic Trading:</span>
+                                            <span class="text-gray-600"> Advanced AI models that analyze market data to execute trades at optimal prices and timing.</span>
+                                        </div>
+                                    </li>
+                                    <li class="flex items-start">
+                                        <span class="text-green-500 mr-2"><i class="fas fa-check-circle mt-1"></i></span>
+                                        <div>
+                                            <span class="font-medium">Credit Assessment:</span>
+                                            <span class="text-gray-600"> AI systems evaluating creditworthiness using broader datasets than traditional methods, expanding financial inclusion.</span>
+                                        </div>
+                                    </li>
+                                    <li class="flex items-start">
+                                        <span class="text-green-500 mr-2"><i class="fas fa-check-circle mt-1"></i></span>
+                                        <div>
+                                            <span class="font-medium">Customer Service:</span>
+                                            <span class="text-gray-600"> AI-powered assistants handling complex financial inquiries and providing personalized guidance.</span>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </div>
+                            
+                            <div>
+                                <h4 class="text-xl font-semibold mb-4">2025 Trends</h4>
+                                <div class="space-y-4">
+                                    <div class="bg-gray-50 p-4 rounded-lg">
+                                        <h5 class="font-medium text-gray-800">Personalized Financial Advice</h5>
+                                        <p class="text-gray-600 mt-1">
+                                            AI systems that provide customized financial guidance based on individual financial situations, goals, and risk tolerances, democratizing access to financial planning.
+                                        </p>
+                                    </div>
+                                    <div class="bg-gray-50 p-4 rounded-lg">
+                                        <h5 class="font-medium text-gray-800">Enhanced Compliance</h5>
+                                        <p class="text-gray-600 mt-1">
+                                            AI tools that continuously monitor transactions and communications for regulatory compliance, reducing risk and operational costs for financial institutions.
+                                        </p>
+                                    </div>
+                                    <div class="bg-gray-50 p-4 rounded-lg">
+                                        <h5 class="font-medium text-gray-800">Alternative Data Analysis</h5>
+                                        <p class="text-gray-600 mt-1">
+                                            Financial models incorporating non-traditional data sources, including social media, satellite imagery, and IoT data, to gain investment insights and assess risk.
+                                        </p>
+                                    </div>
+                                </div>
+                                
+                                <div class="mt-6 bg-green-50 p-4 rounded-lg">
+                                    <h4 class="font-semibold mb-2">Impact Highlight</h4>
+                                    <p class="text-gray-700">
+                                        "In 2025, AI will help financial services scale offerings that previously required significant human capital, making them accessible to broader customer segments. This democratization of financial services is enabling institutions to serve previously underbanked populations while maintaining profitability."
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Manufacturing Section -->
+                <div class="bg-white rounded-lg shadow-md overflow-hidden">
+                    <div class="bg-gray-100 p-6">
+                        <div class="flex items-center">
+                            <div class="text-gray-700 mr-4">
+                                <i class="fas fa-industry text-4xl"></i>
+                            </div>
+                            <h3 class="text-2xl font-bold">Manufacturing</h3>
+                        </div>
+                    </div>
+                    <div class="p-6">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                            <div>
+                                <h4 class="text-xl font-semibold mb-4">Market Overview</h4>
+                                <p class="text-gray-700 mb-4">
+                                    Manufacturing is experiencing a profound transformation through AI adoption in 2025, with smart factories and AI-powered automation driving significant productivity gains across the industry.
+                                </p>
+                                <p class="text-gray-700">
+                                    According to Deloitte's 2025 Manufacturing Industry Outlook, the sector is evolving toward a software-driven industry, with AI playing a central role in this transition across factory operations, supply chain management, and product development.
+                                </p>
+                                
+                                <h4 class="text-xl font-semibold mt-6 mb-4">Key Applications</h4>
+                                <ul class="space-y-3">
+                                    <li class="flex items-start">
+                                        <span class="text-gray-700 mr-2"><i class="fas fa-check-circle mt-1"></i></span>
+                                        <div>
+                                            <span class="font-medium">Predictive Maintenance:</span>
+                                            <span class="text-gray-600"> AI systems that forecast equipment failures before they occur, reducing downtime and maintenance costs.</span>
+                                        </div>
+                                    </li>
+                                    <li class="flex items-start">
+                                        <span class="text-gray-700 mr-2"><i class="fas fa-check-circle mt-1"></i></span>
+                                        <div>
+                                            <span class="font-medium">Quality Control:</span>
+                                            <span class="text-gray-600"> Computer vision systems detecting defects with greater accuracy than human inspectors, improving product quality.</span>
+                                        </div>
+                                    </li>
+                                    <li class="flex items-start">
+                                        <span class="text-gray-700 mr-2"><i class="fas fa-check-circle mt-1"></i></span>
+                                        <div>
+                                            <span class="font-medium">Supply Chain Optimization:</span>
+                                            <span class="text-gray-600"> AI models that predict disruptions and automatically adjust production schedules and logistics.</span>
+                                        </div>
+                                    </li>
+                                    <li class="flex items-start">
+                                        <span class="text-gray-700 mr-2"><i class="fas fa-check-circle mt-1"></i></span>
+                                        <div>
+                                            <span class="font-medium">Generative Design:</span>
+                                            <span class="text-gray-600"> AI tools that can create optimized product designs based on specific constraints and performance requirements.</span>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </div>
+                            
+                            <div>
+                                <h4 class="text-xl font-semibold mb-4">2025 Trends</h4>
+                                <div class="space-y-4">
+                                    <div class="bg-gray-50 p-4 rounded-lg">
+                                        <h5 class="font-medium text-gray-800">Dark Factories</h5>
+                                        <p class="text-gray-600 mt-1">
+                                            Fully automated manufacturing facilities that can operate without human intervention, running 24/7 with AI systems managing all aspects of production.
+                                        </p>
+                                    </div>
+                                    <div class="bg-gray-50 p-4 rounded-lg">
+                                        <h5 class="font-medium text-gray-800">Digital Twins</h5>
+                                        <p class="text-gray-600 mt-1">
+                                            Virtual replicas of physical manufacturing systems that enable simulation, optimization, and predictive analysis before changes are implemented in the real world.
+                                        </p>
+                                    </div>
+                                    <div class="bg-gray-50 p-4 rounded-lg">
+                                        <h5 class="font-medium text-gray-800">Sustainable Manufacturing</h5>
+                                        <p class="text-gray-600 mt-1">
+                                            AI systems optimizing resource usage, energy consumption, and waste reduction, helping manufacturers meet environmental goals and regulatory requirements.
+                                        </p>
+                                    </div>
+                                </div>
+                                
+                                <div class="mt-6 bg-gray-100 p-4 rounded-lg">
+                                    <h4 class="font-semibold mb-2">Impact Highlight</h4>
+                                    <p class="text-gray-700">
+                                        "In 2025, expect to see broader adoption of AI and machine learning across the supply chain, from automated quality control systems to self-learning robotic processes. Manufacturers are moving up the AI maturity spectrum, transitioning from isolated use cases to integrated AI strategies that transform their entire value chain."
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Retail Section -->
+                <div class="bg-white rounded-lg shadow-md overflow-hidden">
+                    <div class="bg-purple-50 p-6">
+                        <div class="flex items-center">
+                            <div class="text-purple-500 mr-4">
+                                <i class="fas fa-shopping-bag text-4xl"></i>
+                            </div>
+                            <h3 class="text-2xl font-bold">Retail</h3>
+                        </div>
+                    </div>
+                    <div class="p-6">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                            <div>
+                                <h4 class="text-xl font-semibold mb-4">Market Overview</h4>
+                                <p class="text-gray-700 mb-4">
+                                    The retail sector is experiencing a profound AI-driven transformation in 2025, with 75% of retailers saying AI agents will be essential to compete effectively in the market, according to Salesforce research.
+                                </p>
+                                <p class="text-gray-700">
+                                    Retailers are integrating AI across their operations, from customer-facing experiences to back-end logistics, creating seamless omnichannel journeys and highly personalized shopping experiences.
+                                </p>
+                                
+                                <h4 class="text-xl font-semibold mt-6 mb-4">Key Applications</h4>
+                                <ul class="space-y-3">
+                                    <li class="flex items-start">
+                                        <span class="text-purple-500 mr-2"><i class="fas fa-check-circle mt-1"></i></span>
+                                        <div>
+                                            <span class="font-medium">Personalized Shopping:</span>
+                                            <span class="text-gray-600"> AI systems that provide individualized product recommendations based on preferences, behavior, and context.</span>
+                                        </div>
+                                    </li>
+                                    <li class="flex items-start">
+                                        <span class="text-purple-500 mr-2"><i class="fas fa-check-circle mt-1"></i></span>
+                                        <div>
+                                            <span class="font-medium">Inventory Optimization:</span>
+                                            <span class="text-gray-600"> Predictive analytics forecasting demand patterns and optimizing stock levels across multiple locations.</span>
+                                        </div>
+                                    </li>
+                                    <li class="flex items-start">
+                                        <span class="text-purple-500 mr-2"><i class="fas fa-check-circle mt-1"></i></span>
+                                        <div>
+                                            <span class="font-medium">Dynamic Pricing:</span>
+                                            <span class="text-gray-600"> AI algorithms that adjust prices in real-time based on demand, competition, and other market factors.</span>
+                                        </div>
+                                    </li>
+                                    <li class="flex items-start">
+                                        <span class="text-purple-500 mr-2"><i class="fas fa-check-circle mt-1"></i></span>
+                                        <div>
+                                            <span class="font-medium">Visual Search:</span>
+                                            <span class="text-gray-600"> Technology allowing customers to search for products using images rather than text, improving discovery.</span>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </div>
+                            
+                            <div>
+                                <h4 class="text-xl font-semibold mb-4">2025 Trends</h4>
+                                <div class="space-y-4">
+                                    <div class="bg-gray-50 p-4 rounded-lg">
+                                        <h5 class="font-medium text-gray-800">Immersive Shopping Experiences</h5>
+                                        <p class="text-gray-600 mt-1">
+                                            AI-powered augmented reality and virtual reality technologies creating interactive and immersive shopping environments online and in physical stores.
+                                        </p>
+                                    </div>
+                                    <div class="bg-gray-50 p-4 rounded-lg">
+                                        <h5 class="font-medium text-gray-800">Retail Media Networks</h5>
+                                        <p class="text-gray-600 mt-1">
+                                            AI-optimized advertising platforms within retail environments that deliver highly targeted promotions to shoppers based on real-time context and intent.
+                                        </p>
+                                    </div>
+                                    <div class="bg-gray-50 p-4 rounded-lg">
+                                        <h5 class="font-medium text-gray-800">Smart Stores</h5>
+                                        <p class="text-gray-600 mt-1">
+                                            Physical retail spaces enhanced with computer vision, IoT sensors, and AI analytics to create frictionless shopping experiences and operational efficiencies.
+                                        </p>
+                                    </div>
+                                </div>
+                                
+                                <div class="mt-6 bg-purple-50 p-4 rounded-lg">
+                                    <h4 class="font-semibold mb-2">Impact Highlight</h4>
+                                    <p class="text-gray-700">
+                                        "The retail landscape will continue to evolve rapidly in 2025, and AI will help brands elevate their customer experiences to meet consumers' rising expectations. Beyond customer service, retailers anticipate AI agents to extend across many other tasks and departments—from optimizing websites and marketing campaigns to managing inventory and supply chains."
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Energy Section -->
+                <div class="bg-white rounded-lg shadow-md overflow-hidden">
+                    <div class="bg-yellow-50 p-6">
+                        <div class="flex items-center">
+                            <div class="text-yellow-600 mr-4">
+                                <i class="fas fa-bolt text-4xl"></i>
+                            </div>
+                            <h3 class="text-2xl font-bold">Energy</h3>
+                        </div>
+                    </div>
+                    <div class="p-6">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                            <div>
+                                <h4 class="text-xl font-semibold mb-4">Market Overview</h4>
+                                <p class="text-gray-700 mb-4">
+                                    AI applications in the energy sector are expanding rapidly in 2025, driven by the dual challenges of increasing energy demand (particularly from AI data centers) and the urgent need for decarbonization and renewable energy integration.
+                                </p>
+                                <p class="text-gray-700">
+                                    According to the World Economic Forum, AI's optimizing capability is helping improve energy efficiency, integrate renewable energy sources, and balance grid demands, making it a key technology for achieving net-zero goals.
+                                </p>
+                                
+                                <h4 class="text-xl font-semibold mt-6 mb-4">Key Applications</h4>
+                                <ul class="space-y-3">
+                                    <li class="flex items-start">
+                                        <span class="text-yellow-600 mr-2"><i class="fas fa-check-circle mt-1"></i></span>
+                                        <div>
+                                            <span class="font-medium">Grid Optimization:</span>
+                                            <span class="text-gray-600"> AI systems balancing electricity supply and demand in real-time, integrating variable renewable energy sources efficiently.</span>
+                                        </div>
+                                    </li>
+                                    <li class="flex items-start">
+                                        <span class="text-yellow-600 mr-2"><i class="fas fa-check-circle mt-1"></i></span>
+                                        <div>
+                                            <span class="font-medium">Predictive Maintenance:</span>
+                                            <span class="text-gray-600"> AI models forecasting equipment failures in power plants and grid infrastructure before they occur.</span>
+                                        </div>
+                                    </li>
+                                    <li class="flex items-start">
+                                        <span class="text-yellow-600 mr-2"><i class="fas fa-check-circle mt-1"></i></span>
+                                        <div>
+                                            <span class="font-medium">Energy Forecasting:</span>
+                                            <span class="text-gray-600"> Advanced algorithms predicting energy production from renewable sources and consumer demand patterns.</span>
+                                        </div>
+                                    </li>
+                                    <li class="flex items-start">
+                                        <span class="text-yellow-600 mr-2"><i class="fas fa-check-circle mt-1"></i></span>
+                                        <div>
+                                            <span class="font-medium">Energy Efficiency:</span>
+                                            <span class="text-gray-600"> AI systems optimizing energy usage in buildings, industrial processes, and data centers.</span>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </div>
+                            
+                            <div>
+                                <h4 class="text-xl font-semibold mb-4">2025 Trends</h4>
+                                <div class="space-y-4">
+                                    <div class="bg-gray-50 p-4 rounded-lg">
+                                        <h5 class="font-medium text-gray-800">Smart Grid Management</h5>
+                                        <p class="text-gray-600 mt-1">
+                                            AI systems coordinating decentralized energy resources, including rooftop solar, electric vehicles, and battery storage, to create more resilient and efficient power networks.
+                                        </p>
+                                    </div>
+                                    <div class="bg-gray-50 p-4 rounded-lg">
+                                        <h5 class="font-medium text-gray-800">Climate Tech Integration</h5>
+                                        <p class="text-gray-600 mt-1">
+                                            AI applications supporting carbon capture, utilization, and storage technologies, helping to reduce greenhouse gas emissions from energy production.
+                                        </p>
+                                    </div>
+                                    <div class="bg-gray-50 p-4 rounded-lg">
+                                        <h5 class="font-medium text-gray-800">Energy-Efficient AI</h5>
+                                        <p class="text-gray-600 mt-1">
+                                            Development of more energy-efficient AI hardware and algorithms to reduce the environmental impact of AI's own growing energy consumption.
+                                        </p>
+                                    </div>
+                                </div>
+                                
+                                <div class="mt-6 bg-yellow-50 p-4 rounded-lg">
+                                    <h4 class="font-semibold mb-2">Impact Highlight</h4>
+                                    <p class="text-gray-700">
+                                        "The World Economic Forum forecasts that AI adoption could cut costs in the energy industry by up to 20% as early as 2025. Meanwhile, AI is being used to enhance grid management and match demand with the varying supply of renewable energy while managing energy consumption peaks, making it an essential tool for the clean energy transition."
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Regulatory Landscape -->
+    <section id="regulation" class="py-16 bg-gray-50">
+        <div class="container mx-auto px-6">
+            <h2 class="section-title text-3xl font-bold">Regulatory Landscape</h2>
+            <p class="text-gray-600 text-lg mb-10">
+                As AI technologies become more pervasive, governments and regulatory bodies worldwide are developing frameworks to ensure responsible and ethical AI development and deployment.
+            </p>
+            
+            <div class="bg-white rounded-lg shadow-md p-8 mb-10">
+                <h3 class="text-2xl font-semibold mb-6">Global Regulatory Developments</h3>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full">
+                        <thead>
+                            <tr>
+                                <th>Region/Country</th>
+                                <th>Key Regulations</th>
+                                <th>Implementation Timeline</th>
+                                <th>Focus Areas</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="font-medium">European Union</td>
+                                <td>AI Act</td>
+                                <td>Phased implementation through 2025-2026</td>
+                                <td>Risk-based approach, categorizing AI systems from minimal to unacceptable risk, with stricter requirements for higher-risk applications</td>
+                            </tr>
+                            <tr>
+                                <td class="font-medium">United States</td>
+                                <td>Executive Order on AI, State-level legislation</td>
+                                <td>Varied implementation timelines throughout 2025</td>
+                                <td>Sector-specific approach, focusing on critical areas like healthcare, finance, and government uses</td>
+                            </tr>
+                            <tr>
+                                <td class="font-medium">China</td>
+                                <td>Generative AI Regulations</td>
+                                <td>Fully implemented in early 2025</td>
+                                <td>Content control, alignment with socialist values, data security, and critical infrastructure protection</td>
+                            </tr>
+                            <tr>
+                                <td class="font-medium">United Kingdom</td>
+                                <td>AI Regulatory Framework</td>
+                                <td>Ongoing implementation through 2025</td>
+                                <td>Principles-based approach with sector-specific guidance and focus on innovation-friendly regulation</td>
+                            </tr>
+                            <tr>
+                                <td class="font-medium">Canada</td>
+                                <td>Artificial Intelligence and Data Act (AIDA)</td>
+                                <td>Progressive implementation in 2025</td>
+                                <td>High-impact AI systems, transparency, and addressing algorithmic harm</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-10">
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h3 class="text-xl font-semibold mb-4">Key Regulatory Focus Areas</h3>
+                    <ul class="space-y-3">
+                        <li class="flex items-start">
+                            <span class="text-blue-500 mr-2"><i class="fas fa-gavel mt-1"></i></span>
+                            <div>
+                                <span class="font-medium">Transparency Requirements</span>
+                                <p class="text-gray-600 mt-1">Mandating disclosure when AI systems are being used and how they make decisions</p>
+                            </div>
+                        </li>
+                        <li class="flex items-start">
+                            <span class="text-blue-500 mr-2"><i class="fas fa-gavel mt-1"></i></span>
+                            <div>
+                                <span class="font-medium">Risk Assessment</span>
+                                <p class="text-gray-600 mt-1">Requirements for evaluating and mitigating potential harms before deploying AI systems</p>
+                            </div>
+                        </li>
+                        <li class="flex items-start">
+                            <span class="text-blue-500 mr-2"><i class="fas fa-gavel mt-1"></i></span>
+                            <div>
+                                <span class="font-medium">Human Oversight</span>
+                                <p class="text-gray-600 mt-1">Ensuring appropriate human supervision for high-risk AI applications</p>
+                            </div>
+                        </li>
+                        <li class="flex items-start">
+                            <span class="text-blue-500 mr-2"><i class="fas fa-gavel mt-1"></i></span>
+                            <div>
+                                <span class="font-medium">Data Governance</span>
+                                <p class="text-gray-600 mt-1">Rules concerning data quality, privacy, and security in AI development</p>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+                
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h3 class="text-xl font-semibold mb-4">Compliance Challenges</h3>
+                    <p class="text-gray-700 mb-4">
+                        Organizations are facing significant challenges in navigating the complex and evolving regulatory landscape for AI in 2025:
+                    </p>
+                    <ul class="space-y-2 text-gray-700">
+                        <li>• Fragmented global regulations requiring different compliance approaches</li>
+                        <li>• Technical complexity of implementing requirements like algorithmic transparency</li>
+                        <li>• Rapid evolution of AI technologies outpacing regulatory frameworks</li>
+                        <li>• Balancing innovation with compliance requirements</li>
+                        <li>• Resource demands of comprehensive governance programs</li>
+                    </ul>
+                </div>
+                
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h3 class="text-xl font-semibold mb-4">Industry Self-Regulation</h3>
+                    <p class="text-gray-700 mb-4">
+                        In response to the regulatory environment, many organizations are adopting self-regulatory approaches in 2025:
+                    </p>
+                    <ul class="space-y-3">
+                        <li class="flex items-start">
+                            <span class="text-blue-500 mr-2"><i class="fas fa-certificate mt-1"></i></span>
+                            <span class="text-gray-600">Development of industry standards and certification programs</span>
+                        </li>
+                        <li class="flex items-start">
+                            <span class="text-blue-500 mr-2"><i class="fas fa-certificate mt-1"></i></span>
+                            <span class="text-gray-600">Creation of AI ethics committees and oversight boards</span>
+                        </li>
+                        <li class="flex items-start">
+                            <span class="text-blue-500 mr-2"><i class="fas fa-certificate mt-1"></i></span>
+                            <span class="text-gray-600">Publishing of transparency reports on AI systems and impacts</span>
+                        </li>
+                        <li class="flex items-start">
+                            <span class="text-blue-500 mr-2"><i class="fas fa-certificate mt-1"></i></span>
+                            <span class="text-gray-600">Adoption of voluntary ethical principles and guidelines</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="timeline">
+                <div class="container-timeline left">
+                    <div class="content">
+                        <h3 class="font-semibold">2023</h3>
+                        <p>Major AI developers sign voluntary commitments on AI safety and responsibility. EU AI Act negotiations finalized.</p>
+                    </div>
+                </div>
+                <div class="container-timeline right">
+                    <div class="content">
+                        <h3 class="font-semibold">Early 2025</h3>
+                        <p>EU AI Act high-risk provisions begin implementation. Several US states enact AI legislation targeting specific sectors.</p>
+                    </div>
+                </div>
+                <div class="container-timeline left">
+                    <div class="content">
+                        <h3 class="font-semibold">Mid 2025</h3>
+                        <p>By May 2, providers must have codes of practice ready to demonstrate compliance with the EU AI Act. Global coordination efforts intensify.</p>
+                    </div>
+                </div>
+                <div class="container-timeline right">
+                    <div class="content">
+                        <h3 class="font-semibold">Late 2025</h3>
+                        <p>Full implementation of various national regulations. International standards bodies release harmonized AI governance frameworks.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Future Outlook -->
+    <section class="py-16 bg-white">
+        <div class="container mx-auto px-6">
+            <h2 class="section-title text-3xl font-bold">Future Outlook</h2>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 mt-10">
+                <div>
+                    <h3 class="text-2xl font-semibold mb-6">Short-term Projections (2025-2027)</h3>
+                    <div class="space-y-6">
+                        <div class="bg-blue-50 p-6 rounded-lg">
+                            <h4 class="font-semibold mb-2">Market Consolidation</h4>
+                            <p class="text-gray-700">
+                                The AI market is likely to see significant consolidation over the next two years, with larger players acquiring specialized AI startups to enhance their capabilities and expand their offerings. This will create a more mature but potentially less diverse ecosystem.
+                            </p>
+                        </div>
+                        
+                        <div class="bg-blue-50 p-6 rounded-lg">
+                            <h4 class="font-semibold mb-2">Mainstream Enterprise Adoption</h4>
+                            <p class="text-gray-700">
+                                AI will transition from experimental technology to core business infrastructure across industries. Enterprises that have been piloting AI solutions will scale their implementations, with a focus on achieving measurable ROI and competitive advantage.
+                            </p>
+                        </div>
+                        
+                        <div class="bg-blue-50 p-6 rounded-lg">
+                            <h4 class="font-semibold mb-2">Regulatory Implementation</h4>
+                            <p class="text-gray-700">
+                                The next two years will see the practical implementation of regulatory frameworks established in 2024-2025. Organizations will invest heavily in compliance mechanisms, potentially slowing innovation in some high-risk domains but creating new opportunities in AI governance and risk management.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div>
+                    <h3 class="text-2xl font-semibold mb-6">Long-term Trajectories (2028-2034)</h3>
+                    <div class="space-y-6">
+                        <div class="bg-indigo-50 p-6 rounded-lg">
+                            <h4 class="font-semibold mb-2">Human-AI Collaboration</h4>
+                            <p class="text-gray-700">
+                                The relationship between humans and AI will evolve toward deeper collaboration, with AI systems designed specifically to complement human capabilities rather than replace them. This symbiotic approach will create new types of roles and working methodologies.
+                            </p>
+                        </div>
+                        
+                        <div class="bg-indigo-50 p-6 rounded-lg">
+                            <h4 class="font-semibold mb-2">Specialized Intelligence</h4>
+                            <p class="text-gray-700">
+                                While general-purpose AI will continue to advance, the market will increasingly value highly specialized AI systems designed for specific industries and applications. These domain-specific models will deliver superior performance and efficiency in their target areas.
+                            </p>
+                        </div>
+                        
+                        <div class="bg-indigo-50 p-6 rounded-lg">
+                            <h4 class="font-semibold mb-2">Sustainable AI</h4>
+                            <p class="text-gray-700">
+                                Environmental considerations will become central to AI development, with breakthroughs in energy-efficient computing and sustainable data center design. The AI industry will need to balance performance improvements with ecological impact, potentially changing core architectural approaches.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mt-12 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg p-8">
+                <h3 class="text-2xl font-semibold mb-4">Key Success Factors for Organizations</h3>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="bg-white p-5 rounded-lg shadow-sm">
+                        <h4 class="font-semibold text-lg mb-3">Strategic Integration</h4>
+                        <p class="text-gray-700">
+                            Organizations should integrate AI into their core business strategy rather than treating it as a separate initiative. This means aligning AI investments with broader business objectives and transforming processes, not just augmenting them.
+                        </p>
+                    </div>
+                    
+                    <div class="bg-white p-5 rounded-lg shadow-sm">
+                        <h4 class="font-semibold text-lg mb-3">AI-Ready Workforce</h4>
+                        <p class="text-gray-700">
+                            Successful organizations will invest heavily in reskilling their workforce and cultivating AI literacy at all levels. This includes technical training for specialists and conceptual understanding for decision-makers and general staff.
+                        </p>
+                    </div>
+                    
+                    <div class="bg-white p-5 rounded-lg shadow-sm">
+                        <h4 class="font-semibold text-lg mb-3">Responsible AI Framework</h4>
+                        <p class="text-gray-700">
+                            Developing robust governance mechanisms for ethical AI deployment will become a competitive advantage, not just a compliance necessity. Organizations with strong responsible AI practices will build greater trust with customers and partners.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- References -->
+    <section class="py-12 bg-gray-50">
+        <div class="container mx-auto px-6">
+            <h2 class="section-title text-3xl font-bold">Sources and References</h2>
+            <div class="bg-white rounded-lg shadow-md p-8 mt-8">
+                <h3 class="text-xl font-semibold mb-4">Market Data and Reports</h3>
+                <ul class="space-y-3">
+                    <li class="flex items-start">
+                        <span class="text-blue-500 mr-2"><i class="fas fa-external-link-alt mt-1"></i></span>
+                        <span>Precedence Research: "Artificial Intelligence (AI) Market Size, Share, and Trends 2025 to 2034" - <a href="https://www.precedenceresearch.com/artificial-intelligence-market" class="text-blue-600 hover:underline">https://www.precedenceresearch.com/artificial-intelligence-market</a></span>
+                    </li>
+                    <li class="flex items-start">
+                        <span class="text-blue-500 mr-2"><i class="fas fa-external-link-alt mt-1"></i></span>
+                        <span>McKinsey & Company: "The State of AI: Global survey" - <a href="https://www.mckinsey.com/capabilities/quantumblack/our-insights/the-state-of-ai" class="text-blue-600 hover:underline">https://www.mckinsey.com/capabilities/quantumblack/our-insights/the-state-of-ai</a></span>
+                    </li>
+                    <li class="flex items-start">
+                        <span class="text-blue-500 mr-2"><i class="fas fa-external-link-alt mt-1"></i></span>
+                        <span>Morgan Stanley: "5 AI Trends Shaping Innovation and ROI in 2025" - <a href="https://www.morganstanley.com/insights/articles/ai-trends-reasoning-frontier-models-2025-tmt" class="text-blue-600 hover:underline">https://www.morganstanley.com/insights/articles/ai-trends-reasoning-frontier-models-2025-tmt</a></span>
+                    </li>
+                    <li class="flex items-start">
+                        <span class="text-blue-500 mr-2"><i class="fas fa-external-link-alt mt-1"></i></span>
+                        <span>Exploding Topics: "54 NEW Artificial Intelligence Statistics (Mar 2025)" - <a href="https://explodingtopics.com/blog/ai-statistics" class="text-blue-600 hover:underline">https://explodingtopics.com/blog/ai-statistics</a></span>
+                    </li>
+                </ul>
+                
+                <h3 class="text-xl font-semibold mb-4 mt-8">Industry Analyses and Trend Reports</h3>
+                <ul class="space-y-3">
+                    <li class="flex items-start">
+                        <span class="text-blue-500 mr-2"><i class="fas fa-external-link-alt mt-1"></i></span>
+                        <span>MIT Technology Review: "What's next for AI in 2025" - <a href="https://www.technologyreview.com/2025/01/08/1109188/whats-next-for-ai-in-2025/" class="text-blue-600 hover:underline">https://www.technologyreview.com/2025/01/08/1109188/whats-next-for-ai-in-2025/</a></span>
+                    </li>
+                    <li class="flex items-start">
+                        <span class="text-blue-500 mr-2"><i class="fas fa-external-link-alt mt-1"></i></span>
+                        <span>Microsoft News: "6 AI trends you'll see more of in 2025" - <a href="https://news.microsoft.com/source/features/ai/6-ai-trends-youll-see-more-of-in-2025/" class="text-blue-600 hover:underline">https://news.microsoft.com/source/features/ai/6-ai-trends-youll-see-more-of-in-2025/</a></span>
+                    </li>
+                    <li class="flex items-start">
+                        <span class="text-blue-500 mr-2"><i class="fas fa-external-link-alt mt-1"></i></span>
+                        <span>World Economic Forum: "Future of Jobs Report 2025" - <a href="https://www.weforum.org/stories/2025/01/future-of-jobs-report-2025-jobs-of-the-future-and-the-skills-you-need-to-get-them/" class="text-blue-600 hover:underline">https://www.weforum.org/stories/2025/01/future-of-jobs-report-2025-jobs-of-the-future-and-the-skills-you-need-to-get-them/</a></span>
+                    </li>
+                </ul>
+                
+                <h3 class="text-xl font-semibold mb-4 mt-8">Regulatory and Ethical Considerations</h3>
+                <ul class="space-y-3">
+                    <li class="flex items-start">
+                        <span class="text-blue-500 mr-2"><i class="fas fa-external-link-alt mt-1"></i></span>
+                        <span>IBM: "AI ethics and governance in 2025" - <a href="https://www.ibm.com/think/insights/ai-ethics-and-governance-in-2025" class="text-blue-600 hover:underline">https://www.ibm.com/think/insights/ai-ethics-and-governance-in-2025</a></span>
+                    </li>
+                    <li class="flex items-start">
+                        <span class="text-blue-500 mr-2"><i class="fas fa-external-link-alt mt-1"></i></span>
+                        <span>Forbes: "Will AI Save Or Harm Us? 3 Ethical Challenges For Businesses In 2025" - <a href="https://www.forbes.com/sites/bruceweinstein/2024/12/11/will-ai-save-or-harm-us-3-ethical-challenges-for-businesses-in-2025/" class="text-blue-600 hover:underline">https://www.forbes.com/sites/bruceweinstein/2024/12/11/will-ai-save-or-harm-us-3-ethical-challenges-for-businesses-in-2025/</a></span>
+                    </li>
+                    <li class="flex items-start">
+                        <span class="text-blue-500 mr-2"><i class="fas fa-external-link-alt mt-1"></i></span>
+                        <span>NCSL: "Summary Artificial Intelligence 2025 Legislation" - <a href="https://www.ncsl.org/technology-and-communication/artificial-intelligence-2025-legislation" class="text-blue-600 hover:underline">https://www.ncsl.org/technology-and-communication/artificial-intelligence-2025-legislation</a></span>
+                    </li>
+                </ul>
+                
+                <h3 class="text-xl font-semibold mb-4 mt-8">Sector-Specific Reports</h3>
+                <ul class="space-y-3">
+                    <li class="flex items-start">
+                        <span class="text-blue-500 mr-2"><i class="fas fa-external-link-alt mt-1"></i></span>
+                        <span>Salesforce: "75% of Retailers Say AI Agents Will Be Essential to Compete" - <a href="https://www.salesforce.com/news/stories/ai-agent-retail-trends-2025/" class="text-blue-600 hover:underline">https://www.salesforce.com/news/stories/ai-agent-retail-trends-2025/</a></span>
+                    </li>
+                    <li class="flex items-start">
+                        <span class="text-blue-500 mr-2"><i class="fas fa-external-link-alt mt-1"></i></span>
+                        <span>Google Cloud: "5 AI Trends Shaping the Future of Public Sector in 2025" - <a href="https://cloud.google.com/blog/topics/public-sector/5-ai-trends-shaping-the-future-of-the-public-sector-in-2025" class="text-blue-600 hover:underline">https://cloud.google.com/blog/topics/public-sector/5-ai-trends-shaping-the-future-of-the-public-sector-in-2025</a></span>
+                    </li>
+                    <li class="flex items-start">
+                        <span class="text-blue-500 mr-2"><i class="fas fa-external-link-alt mt-1"></i></span>
+                        <span>World Economic Forum: "Energy and AI: the power couple that could usher in a net-zero world" - <a href="https://www.weforum.org/stories/2025/01/energy-ai-net-zero/" class="text-blue-600 hover:underline">https://www.weforum.org/stories/2025/01/energy-ai-net-zero/</a></span>
+                    </li>
+                    <li class="flex items-start">
+                        <span class="text-blue-500 mr-2"><i class="fas fa-external-link-alt mt-1"></i></span>
+                        <span>IBM: "IBM Study: Gen AI Will Elevate Financial Performance of Banks in 2025" - <a href="https://newsroom.ibm.com/2025-02-05-ibm-study-gen-ai-will-elevate-financial-performance-of-banks-in-2025" class="text-blue-600 hover:underline">https://newsroom.ibm.com/2025-02-05-ibm-study-gen-ai-will-elevate-financial-performance-of-banks-in-2025</a></span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="gradient-bg text-white py-10">
+        <div class="container mx-auto px-6">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <div>
+                    <h2 class="text-2xl font-bold">AI Market Analysis 2025</h2>
+                    <p class="mt-2">A comprehensive analysis of the artificial intelligence landscape</p>
+                </div>
+                <div class="mt-6 md:mt-0">
+                    <p>Last Updated: April 2025</p>
+                    <p class="mt-2">© 2025 AI Market Analysis. All rights reserved.</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>
